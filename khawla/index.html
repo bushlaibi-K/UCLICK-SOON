@@ -33,11 +33,12 @@
   --ar-display:"Amiri","Geeza Pro","Traditional Arabic",serif;
   --ar-body:"IBM Plex Sans Arabic","Geeza Pro","Segoe UI",Tahoma,sans-serif;
   --track:.22em;
+  --wa:#1e8e4e;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --paper:#110f10;--paper-2:#1a1718;--ink:#f4efef;--ink-soft:#b3a9ab;--line:#2e292a;--red:#e05a6e;--solid:#f4efef;--on-solid:#110f10;color-scheme:dark}}
+  --paper:#110f10;--paper-2:#1a1718;--ink:#f4efef;--ink-soft:#b3a9ab;--line:#2e292a;--red:#e05a6e;--solid:#f4efef;--on-solid:#110f10;--wa:#2fb067;color-scheme:dark}}
 :root[data-theme="dark"]{
-  --paper:#110f10;--paper-2:#1a1718;--ink:#f4efef;--ink-soft:#b3a9ab;--line:#2e292a;--red:#e05a6e;--solid:#f4efef;--on-solid:#110f10;color-scheme:dark}
+  --paper:#110f10;--paper-2:#1a1718;--ink:#f4efef;--ink-soft:#b3a9ab;--line:#2e292a;--red:#e05a6e;--solid:#f4efef;--on-solid:#110f10;--wa:#2fb067;color-scheme:dark}
 :root[lang="ar"]{--display:var(--ar-display);--body:var(--ar-body);--track:0}
 
 *{box-sizing:border-box}
@@ -188,6 +189,25 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .branch .acts{display:flex;flex-wrap:wrap;gap:10px;margin-top:auto;padding-top:6px}
 .ig{margin-top:24px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;padding:22px 26px;border:1px dashed var(--line);border-radius:6px}
 .ig p{margin:0;color:var(--ink-soft)}
+
+/* whatsapp form */
+.wa{border:1px solid var(--ink);border-radius:8px;padding:34px;margin-bottom:28px;display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:36px 56px;align-items:start}
+@media (max-width:860px){.wa{grid-template-columns:1fr;padding:24px;gap:24px}}
+.wa h3{font-size:2rem;margin:10px 0 10px}
+.wa .intro p{margin:0;color:var(--ink-soft)}
+.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:560px){.fields{grid-template-columns:1fr}}
+.fields label{display:flex;flex-direction:column;gap:6px;min-width:0}
+.fields label.full{grid-column:1/-1}
+.fields label>span{font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-soft);font-weight:500}
+:root[lang="ar"] .fields label>span{font-size:.88rem;letter-spacing:0;text-transform:none}
+.fields input,.fields select{width:100%;min-height:48px;padding:10px 14px;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);font:400 1rem var(--body)}
+.fields input:focus,.fields select:focus{border-color:var(--ink);outline:none}
+.send{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:16px;padding-top:4px}
+.btn.wa-btn{background:var(--wa);border-color:var(--wa);color:#fff}
+.btn.wa-btn:hover{background:transparent;color:var(--wa)}
+.send small{color:var(--ink-soft);font-size:.9rem}
+.wa-ico{width:18px;height:18px;flex:none}
 
 /* faq */
 .faq{max-width:820px}
@@ -374,37 +394,57 @@ footer{border-top:1px solid var(--line)}
     <div class="wrap">
       <div class="head">
         <div><div class="label" data-k="bk_eyebrow">Book</div><h2 data-k="bk_title">Book your appointment</h2></div>
-        <p data-k="bk_lead">Call the branch nearest to you. It takes a minute.</p>
+        <p data-k="bk_lead">Book on WhatsApp in a few taps, or call the branch nearest to you.</p>
       </div>
       <ol class="how">
-        <li data-k="hw1">Call your branch or message us on Instagram</li>
+        <li data-k="hw1">Send us your request on WhatsApp, or call your branch</li>
         <li data-k="hw2">Tell us the service and the day that suits you</li>
         <li data-k="hw3">We confirm your time and the price</li>
       </ol>
+      <form class="wa" id="waform" novalidate>
+        <div class="intro">
+          <div class="label" data-k="wa_eyebrow">WhatsApp</div>
+          <h3 data-k="wa_title">Book on WhatsApp</h3>
+          <p data-k="wa_lead">Choose your branch and service. WhatsApp opens with your message ready, so you only need to press send.</p>
+        </div>
+        <div class="fields">
+          <label><span data-k="f_branch">Branch</span><select id="f-branch"><option value="m" data-k="m_name">Muharraq</option><option value="d" data-k="d_name">Durrat Al Bahrain</option></select></label>
+          <label><span data-k="f_service">Service</span><select id="f-service"></select></label>
+          <label><span data-k="f_date">Preferred day</span><input type="date" id="f-date"></label>
+          <label><span data-k="f_time">Preferred time</span><select id="f-time"></select></label>
+          <label class="full"><span data-k="f_name">Your name</span><input type="text" id="f-name" autocomplete="name"></label>
+          <div class="send">
+            <a class="btn wa-btn" id="wa-send" href="https://wa.me/97336323231" target="_blank" rel="noopener"><svg class="wa-ico" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.1 5.1 0 0 0 1.1 2.7 11.7 11.7 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.3c0-.1-.2-.2-.5-.3Z"/></svg><span data-k="wa_send">Send on WhatsApp</span></a>
+            <small data-k="wa_hint">We reply to confirm your time and the price.</small>
+          </div>
+        </div>
+      </form>
       <div class="branches">
         <article class="branch">
           <h3><span data-k="m_name">Muharraq</span><small data-k="m_tag">Main branch</small></h3>
           <dl>
+            <dt data-k="wa">WhatsApp</dt><dd><span class="tel">3632 3231</span></dd>
             <dt data-k="phone">Phone</dt><dd><span class="tel">1733 1299</span></dd>
             <dt data-k="hours">Hours</dt><dd data-k="m_hours">Daily, 8:30 AM – 8:00 PM</dd>
             <dt data-k="addr">Address</dt><dd data-k="m_addr">Shop 274, Road 311, Muharraq</dd>
           </dl>
           <div class="acts">
-            <a class="btn sm" href="tel:+97317331299" data-k="call">Call</a>
-            <button class="btn sm line" type="button" data-copy="17331299" data-k="copy">Copy number</button>
+            <a class="btn sm wa-btn" href="https://wa.me/97336323231" target="_blank" rel="noopener"><svg class="wa-ico" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.1 5.1 0 0 0 1.1 2.7 11.7 11.7 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.3c0-.1-.2-.2-.5-.3Z"/></svg><span data-k="wa">WhatsApp</span></a>
+            <a class="btn sm line" href="tel:+97317331299" data-k="call">Call</a>
             <a class="btn sm line" href="https://maps.app.goo.gl/vbYdbDBhsabyAZfm8" target="_blank" rel="noopener" data-k="dir">Directions</a>
           </div>
         </article>
         <article class="branch">
           <h3><span data-k="d_name">Durrat Al Bahrain</span><small data-k="d_tag">Branch</small></h3>
           <dl>
+            <dt data-k="wa">WhatsApp</dt><dd><span class="tel">3918 1810</span></dd>
             <dt data-k="phone">Phone</dt><dd><span class="tel">1700 0292</span></dd>
             <dt data-k="hours">Hours</dt><dd data-k="d_hours">From 10:00 AM</dd>
             <dt data-k="addr">Address</dt><dd data-k="d_addr">Durrat Al Bahrain</dd>
           </dl>
           <div class="acts">
-            <a class="btn sm" href="tel:+97317000292" data-k="call">Call</a>
-            <button class="btn sm line" type="button" data-copy="17000292" data-k="copy">Copy number</button>
+            <a class="btn sm wa-btn" href="https://wa.me/97339181810" target="_blank" rel="noopener"><svg class="wa-ico" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.1 5.1 0 0 0 1.1 2.7 11.7 11.7 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.3c0-.1-.2-.2-.5-.3Z"/></svg><span data-k="wa">WhatsApp</span></a>
+            <a class="btn sm line" href="tel:+97317000292" data-k="call">Call</a>
             <a class="btn sm line" href="https://maps.app.goo.gl/Pj6AbXfTdbprLsXE9" target="_blank" rel="noopener" data-k="dir">Directions</a>
           </div>
         </article>
@@ -438,15 +478,15 @@ footer{border-top:1px solid var(--line)}
         <a class="brand" href="#top"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNTAwIDE1MDAiPjxjaXJjbGUgY3g9Ijc1MCIgY3k9Ijc1MCIgcj0iNzQ1IiBmaWxsPSIjMTExIi8+PGNpcmNsZSBjeD0iNzUwIiBjeT0iNzUwIiByPSI2NDUiIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNOTQzLDExMzRDOTQwLDExMzEgOTQwLDExMjYgOTQzLDExMjJDOTQ3LDExMTQgOTU5LDEwOTAgOTU5LDEwODZDOTYwLDEwODQgOTYyLDEwNzkgOTY0LDEwNzRDOTY2LDEwNjkgOTY4LDEwNjAgOTY5LDEwNTVDOTcwLDEwNDkgOTcyLDEwNDEgOTczLDEwMzdDOTc3LDEwMjcgOTc4LDEwMjIgOTc5LDEwMTBDOTg3LDkzMyA5NzgsODg2IDk1MCw4NTRDOTQzLDg0NyA5NDIsODQ2IDkzMiw4NDFDOTExLDgzMSA5MDMsODMwIDg3Nyw4MzlDODUwLDg0OSA4MTcsODgwIDc4Miw5MjlDNzc2LDkzNiA3NjYsOTUwIDc0OCw5NzJDNzM2LDk4NiA3MDgsMTAxOCA2OTIsMTAzNEM2ODcsMTA0MCA2ODIsMTA0NSA2ODIsMTA0NUM2ODIsMTA0NSA2NzYsMTA1MSA2NjksMTA1N0M2NjIsMTA2MyA2NTIsMTA3MyA2NDYsMTA3OEM2MzIsMTA5MiA2MjcsMTA5NiA2MDIsMTExMkM1ODYsMTEyMyA1NzAsMTEyNyA1NjIsMTEyMUM1NTUsMTExNiA1NTEsMTEwNiA1NTYsMTEwNEM1NTksMTEwMyA1NjEsMTEwNCA1NjgsMTEwN0M1NzYsMTExMCA1ODMsMTExMCA1OTAsMTEwNUM1OTMsMTEwMyA1OTcsMTEwMCA1OTksMTA5OUM2MjAsMTA4OSA2NjUsMTA0OCA3MDAsMTAwOUM3MDYsMTAwMiA3MTQsOTkyIDcxOCw5ODhDNzIyLDk4NCA3MjcsOTc4IDcyOSw5NzVDNzMxLDk3MiA3MzksOTYyIDc0Niw5NTNDNzY3LDkyNyA3NjcsOTI3IDc3MCw5MjNDNzcxLDkyMSA3NzMsOTE4IDc3NSw5MTZDNzc2LDkxNSA3ODAsOTEwIDc4Myw5MDVDNzkxLDg5NSA4MjIsODYwIDgyOSw4NTRDODM3LDg0NyA4NDcsODQwIDg1MSw4MzhDODU0LDgzNyA4NTcsODM1IDg1OSw4MzNDODYzLDgzMSA4ODEsODIzIDg4OSw4MjFDODk2LDgyMCA5MTIsODIwIDkyMSw4MjFDOTM5LDgyNCA5NjAsODQwIDk3Myw4NjFDOTkyLDg5MCAxMDAwLDk0MyA5OTUsOTkyQzk5MiwxMDE0IDk4OCwxMDM1IDk4NiwxMDQ0Qzk4MSwxMDU5IDk4MywxMDY4IDk4OSwxMDU4Qzk5MCwxMDU2IDk5MiwxMDUzIDk5NCwxMDUxQzk5OCwxMDQ3IDEwMDcsMTAyNiAxMDA5LDEwMThDMTAxMCwxMDE0IDEwMTMsMTAwOCAxMDE1LDEwMDNDMTAxOSw5OTMgMTAyNyw5NTggMTAyOCw5NDBDMTAzMCw5MjEgMTAyOSw5MDggMTAyNCw4OTNDMTAyMiw4ODYgMTAyMCw4NzYgMTAxOSw4NzJDMTAxOCw4NjggMTAxNiw4NjQgMTAxNSw4NjJDMTAxNCw4NjEgMTAxMiw4NTcgMTAxMCw4NTRDMTAwNyw4NDcgOTk5LDgzNyA5OTIsODMwQzk2OCw4MDYgOTQ5LDc3NiA5MzgsNzQ2QzkzNiw3NDIgOTM0LDczNiA5MzMsNzMyQzkzMSw3MjkgOTI5LDcyMSA5MjgsNzEzQzkyNyw3MDYgOTI2LDY5OSA5MjUsNjk3QzkyNCw2OTQgOTIyLDY3MiA5MjMsNjY2QzkyNCw2NjAgOTI3LDY1NyA5MzEsNjU3QzkzNiw2NTggOTM3LDY2MSA5MzcsNjczQzkzNiw2ODYgOTQxLDcxNCA5NDYsNzI3Qzk1OSw3NTcgOTYyLDc2NCA5NjUsNzY5Qzk2Nyw3NzEgOTY5LDc3NSA5NzAsNzc4Qzk3NCw3ODUgOTgxLDc5NiA5OTAsODA3QzEwMDAsODIxIDEwMDQsODI2IDEwMDksODM0QzEwMTIsODM4IDEwMTUsODQxIDEwMTYsODQyQzEwMjMsODQ5IDEwMzUsODgxIDEwMzgsOTA1QzEwNDAsOTIxIDEwMzksOTU0IDEwMzUsOTY4QzEwMzMsOTc0IDEwMzEsOTg0IDEwMzAsOTkwQzEwMjksOTk2IDEwMjgsMTAwMiAxMDI1LDEwMDhDMTAyMywxMDEzIDEwMjAsMTAyMCAxMDE5LDEwMjRDMTAxOCwxMDI4IDEwMTYsMTAzMyAxMDE1LDEwMzVDMTAxNCwxMDM4IDEwMTIsMTA0MiAxMDExLDEwNDVDMTAxMCwxMDQ4IDEwMDgsMTA1MiAxMDA2LDEwNTRDMTAwNSwxMDU1IDEwMDMsMTA2MCAxMDAxLDEwNjRDOTk5LDEwNjcgOTk3LDEwNzIgOTk1LDEwNzRDOTk0LDEwNzYgOTkxLDEwODAgOTkwLDEwODJDOTg1LDEwOTEgOTY3LDExMjAgOTY1LDExMjJDOTY0LDExMjIgOTYyLDExMjUgOTYwLDExMjhDOTU1LDExMzcgOTQ3LDExNDAgOTQzLDExMzRaTTc1Miw3NzhDNzQ1LDc3NCA3MzQsNzY2IDczMCw3NjBDNzI3LDc1NyA3MjQsNzU0IDcyMyw3NTNDNzIzLDc1MiA3MTksNzQ3IDcxNSw3NDJDNzExLDczNyA3MDMsNzI3IDY5OCw3MjBDNjkyLDcxMyA2ODYsNzA1IDY4NCw3MDJDNjc4LDY5NCA2NzYsNjkzIDY2OSw2OTJDNjY0LDY5MiA2NjIsNjkyIDY1OCw2OTVDNjUwLDY5OSA2NDcsNzAwIDYzMyw3MDJDNjI2LDcwMiA2MTUsNzA0IDYwOSw3MDZDNTk2LDcwOSA1NjMsNzEwIDUzNiw3MTBDNTE3LDcwOSA0ODMsNzA2IDQ3Nyw3MDRDNDc1LDcwNCA0NjgsNzAyIDQ2Miw3MDJDNDU1LDcwMSA0NDQsNjk4IDQzOCw2OTZDNDMyLDY5NCA0MjMsNjkyIDQxOSw2OTFDNDExLDY4OCAzOTQsNjgwIDM4NSw2NzVDMzgyLDY3MyAzNzgsNjcwIDM3Niw2NjlDMzcxLDY2NiAzNTcsNjUzIDM1NCw2NDdDMzQ5LDY0MSAzNDcsNjIxIDM1MCw2MTRDMzU3LDU5NyAzODYsNTY4IDQwNyw1NThDNDA5LDU1NyA0MTMsNTU1IDQxNCw1NTNDNDE3LDU1MSA0MzgsNTQwIDQ2MCw1MjlDNDcyLDUyMyA0ODgsNTE1IDUwMiw1MDlDNTA2LDUwNyA1MTIsNTA1IDUxNSw1MDNDNTE4LDUwMiA1MjIsNTAwIDUyNCw0OTlDNTI3LDQ5OCA1MzIsNDk2IDUzNyw0OTRDNTQyLDQ5MiA1NDgsNDg5IDU1MSw0ODlDNTU1LDQ4OCA1NTksNDg2IDU2Miw0ODVDNTY0LDQ4MyA1NzAsNDgxIDU3NCw0ODBDNTg5LDQ3NiA1OTMsNDcwIDU5Miw0NTdDNTkyLDQ1MSA1OTIsNDQ4IDU5NCw0NDJDNTk2LDQzNyA1OTcsNDMwIDU5OCw0MjZDNTk5LDQxNiA2MDIsNDA5IDYwNSw0MDFDNjA3LDM5NyA2MDksMzkzIDYwOSwzOTJDNjEwLDM5MSA2MTMsMzg1IDYxNSwzODBDNjMwLDM1NCA2NTQsMzI4IDY3NCwzMTVDNjk1LDMwMiA2OTksMzAwIDcyMCwyOTJDNzM3LDI4NiA3NzQsMjg1IDc5NywyODlDODQzLDI5NyA4OTMsMzM1IDkxMiwzNzhDOTE4LDM5MCA5MjYsMzkyIDk2MCwzODdDOTc5LDM4NCAxMDE4LDM4MiAxMDQwLDM4MkMxMDYxLDM4MyAxMDYyLDM4MyAxMDc4LDM4N0MxMDg4LDM4OSAxMDk5LDM5MyAxMTA0LDM5NUMxMTA5LDM5NiAxMTEzLDM5OCAxMTE0LDM5OEMxMTE5LDM5OCAxMTM3LDQxMiAxMTQ0LDQyMUMxMTUzLDQzMyAxMTUzLDQzOCAxMTUwLDQ1OEMxMTQyLDUwNSAxMDkzLDU2MiAxMDI2LDYwNEMxMDEzLDYxMiA5OTcsNjIxIDk5NCw2MjJDOTkzLDYyMiA5ODgsNjI0IDk4NCw2MjZDOTc5LDYyOCA5NzMsNjMxIDk3MCw2MzJDOTY2LDYzMyA5NjEsNjM1IDk1Nyw2MzZDOTQ1LDY0MiA5MzMsNjQxIDkzMSw2MzVDOTI5LDYzMCA5MzUsNjI1IDk0Niw2MjJDOTY1LDYxOCA5OTgsNjA0IDEwMTAsNTk1QzEwMTIsNTkzIDEwMTYsNTkxIDEwMjAsNTg5QzEwNDEsNTc3IDEwNzIsNTUxIDEwOTMsNTI3QzExMTMsNTA1IDExMjQsNDg4IDExMzIsNDY2QzExMzksNDQ0IDExMzksNDM5IDExMjksNDMxQzExMTksNDIzIDExMTIsNDIxIDEwOTIsNDIxQzEwNzcsNDIxIDEwMzUsNDMwIDEwMTgsNDM2QzEwMTMsNDM4IDEwMDcsNDQxIDEwMDQsNDQxQzEwMDEsNDQyIDk5Niw0NDQgOTkzLDQ0NkM5OTAsNDQ3IDk4Niw0NDkgOTg0LDQ1MEM5NzksNDUxIDk1Niw0NjIgOTUwLDQ2NUM5NDksNDY2IDk0Myw0NjkgOTM4LDQ3MUM5MzQsNDc0IDkyNiw0NzggOTIyLDQ4MEM5MTgsNDgyIDkxMyw0ODYgOTEwLDQ4N0M5MDcsNDg5IDkwMSw0OTMgODk3LDQ5NkM4NzcsNTA4IDg3Miw1MTIgODQ4LDUzNUM4NDAsNTQyIDgzMCw1NTEgODI2LDU1NEM3OTQsNTc5IDc4NSw1ODYgNzc1LDU5MEM3NzIsNTkyIDc2OCw1OTQgNzY2LDU5NkM3NjQsNTk3IDc2MCw2MDAgNzU3LDYwMUM3NTQsNjAzIDc1MCw2MDUgNzQ5LDYwNkM3NDgsNjA3IDc0NCw2MDkgNzQwLDYxMEM3MzEsNjE0IDcyMCw2MjIgNzE2LDYyN0M3MTIsNjMyIDcxMiw2MzIgNzAxLDYzMkM2OTEsNjMyIDY5MCw2MzIgNjg1LDYzNUM2ODIsNjM2IDY3Nyw2MzkgNjc0LDY0MEM2NjcsNjQyIDY2Myw2NDYgNjYzLDY1MEM2NjMsNjU0IDY2OSw2NjQgNjc2LDY3MkM2NzgsNjc0IDY4MSw2NzggNjgzLDY4MEM2ODUsNjgzIDY4OCw2ODggNjkxLDY5MUM2OTQsNjk0IDY5Nyw2OTkgNzAwLDcwMkM3MDIsNzA1IDcwNSw3MDkgNzA3LDcxMkM3MTMsNzE5IDcyOCw3MzggNzMyLDc0NEM3NDAsNzU1IDc1MSw3NjcgNzU2LDc2OEM3NjUsNzcxIDc3NSw3NjkgNzg1LDc2NEM3ODksNzYyIDc5NCw3NjAgNzk2LDc1OUM3OTksNzU4IDgwMiw3NTYgODA1LDc1NUM4MDcsNzUzIDgxMSw3NTEgODEzLDc1MEM4MTcsNzQ5IDgyNyw3NDIgODM0LDczNkM4MzcsNzM0IDg0NCw3MjkgODUwLDcyNUM4NjcsNzE0IDg4Myw2OTggODkxLDY4NkM4OTgsNjc2IDkwMiw2NzcgODk5LDY4N0M4OTcsNjk1IDg4Myw3MTMgODcyLDcyMUM4NjksNzIzIDg2Myw3MjggODU4LDczMkM4NTQsNzM1IDg0OCw3MzkgODQ2LDc0MEM4NDMsNzQxIDg0MSw3NDMgODQwLDc0NEM4MzksNzQ0IDgzNiw3NDYgODMyLDc0OUM4MjgsNzUxIDgyNCw3NTMgODIyLDc1NUM4MTAsNzYzIDgwMCw3NjkgNzk0LDc3MkM3OTAsNzczIDc4NCw3NzUgNzgyLDc3NkM3NzUsNzc5IDc1Nyw3ODAgNzUyLDc3OFpNNTgxLDY5M0M1OTQsNjkxIDYxMyw2ODkgNjIyLDY4OUM2MzgsNjg3IDY1Myw2ODMgNjU3LDY3OUM2NjAsNjc3IDY1OSw2NzIgNjU1LDY2NEM2NTAsNjU2IDY0Nyw2NTIgNjQzLDY1MkM2NDAsNjUxIDYzMCw2NTMgNjE5LDY1NkM2MTUsNjU4IDYwNiw2NjAgNjAwLDY2MUM1OTQsNjYyIDU4NSw2NjQgNTgwLDY2NkM1NzYsNjY3IDU2OCw2NjggNTYyLDY2OUM1NTUsNjY5IDU0MSw2NzEgNTMwLDY3MkM0OTUsNjc0IDQ1MCw2NzIgNDI4LDY2NkM0MjEsNjY0IDQxMSw2NjEgNDA2LDY2MEM0MDAsNjU5IDM5NSw2NTggMzkzLDY1NkMzODksNjU0IDM4NCw2NTMgMzg0LDY1NUMzODQsNjU2IDM4Niw2NTcgMzg4LDY1OEMzOTEsNjU5IDM5NCw2NjIgMzk1LDY2NEMzOTcsNjY2IDQwMCw2NjcgNDAzLDY2OUM0MDYsNjcwIDQxMiw2NzIgNDE1LDY3NEM0MTksNjc2IDQyNiw2NzggNDMwLDY3OUM0MzQsNjc5IDQ0Miw2ODEgNDQ2LDY4M0M0NTksNjg3IDQ2OSw2ODkgNDkwLDY5MUM1MDAsNjkxIDUxNSw2OTMgNTIyLDY5M0M1NDMsNjk1IDU1NCw2OTUgNTgxLDY5M1pNNTQwLDY1OUM1NTIsNjU4IDU1OSw2NTcgNTcwLDY1NUM1NzgsNjUzIDU5MCw2NTAgNTk4LDY0OUM2MDUsNjQ4IDYxMyw2NDYgNjE3LDY0NUM2MjEsNjQzIDYyNyw2NDEgNjMyLDY0MEM2MzcsNjQwIDY0NCw2MzcgNjQ5LDYzNUM2NTQsNjM0IDY2MSw2MzEgNjY2LDYzMEM2NzAsNjI5IDY3OCw2MjYgNjgzLDYyNEM2ODgsNjIyIDY5Myw2MjAgNjk0LDYyMEM2OTUsNjE5IDY5OSw2MTcgNzAyLDYxNkM3MDYsNjE0IDcxMiw2MTIgNzE1LDYxMEM3MTksNjA5IDcyMyw2MDcgNzI1LDYwNkM3MjcsNjA1IDczMSw2MDIgNzM2LDYwMEM3NDAsNTk5IDc0NSw1OTYgNzQ2LDU5NUM3NDgsNTkzIDc1Miw1OTEgNzU2LDU5MEM3NTksNTg4IDc2Myw1ODYgNzY1LDU4NEM3NjcsNTgzIDc3MCw1ODEgNzcyLDU4MEM3NzQsNTc5IDc3OCw1NzYgNzgwLDU3NUM3ODIsNTczIDc4Nyw1NzAgNzg5LDU2OUM4MDAsNTYzIDgyNSw1NDEgODMwLDUzNUM4MzQsNTI5IDg3Myw0OTUgODgyLDQ4OUM4ODMsNDg4IDg4Nyw0ODYgODkxLDQ4M0M5MDYsNDcyIDk1OCw0NDMgOTcwLDQzOUM5NzMsNDM4IDk3Nyw0MzYgOTgwLDQzNUM5ODMsNDMzIDk5MCw0MzAgOTk2LDQyOUMxMDAxLDQyNyAxMDA4LDQyNCAxMDEwLDQyM0MxMDE2LDQyMCAxMDQ4LDQxMiAxMDYyLDQxMEMxMDgwLDQwNyAxMDgzLDQwNCAxMDcwLDQwMUMxMDY5LDQwMCAxMDYyLDM5OSAxMDUzLDM5OEMxMDM3LDM5NyAxMDM1LDM5NyA5OTYsMzk5Qzk4Niw0MDAgOTY5LDQwMCA5NjAsNDAxQzk0OSw0MDIgOTM1LDQwMyA5MjIsNDA1QzkxMCw0MDcgODkyLDQxMCA4ODIsNDEyQzg3Miw0MTMgODU5LDQxNSA4NTQsNDE3Qzg1MCw0MTggODQxLDQyMCA4MzYsNDIwQzgyMyw0MjIgODA4LDQyNiA4MDIsNDI4QzgwMCw0MjggNzkyLDQzMCA3ODYsNDMxQzc4MCw0MzIgNzcxLDQzNCA3NjUsNDM2Qzc2MCw0MzggNzUyLDQ0MCA3NDcsNDQxQzc0Miw0NDIgNzMzLDQ0NSA3MjYsNDQ2QzcyMCw0NDggNzEzLDQ1MCA3MDksNDUxQzcwNSw0NTIgNjk5LDQ1NCA2OTQsNDU1QzY4OSw0NTcgNjgxLDQ1OSA2NzUsNDYxQzY3MCw0NjIgNjYyLDQ2NCA2NTksNDY1QzY1NSw0NjcgNjQ5LDQ2OSA2NDQsNDcwQzYzOSw0NzEgNjMzLDQ3MyA2MzAsNDc1QzYyNyw0NzcgNjIwLDQ3OSA2MTUsNDgxQzYxMCw0ODIgNjAzLDQ4NSA1OTksNDg2QzU5NSw0ODggNTkwLDQ5MCA1ODYsNDkxQzU4Myw0OTEgNTc3LDQ5NCA1NzMsNDk2QzU2OSw0OTcgNTYxLDUwMCA1NTYsNTAyQzU1Miw1MDMgNTQ2LDUwNSA1NDQsNTA2QzU0Myw1MDcgNTM3LDUwOSA1MzMsNTExQzUyOCw1MTMgNTIyLDUxNSA1MjAsNTE2QzUxNyw1MTggNTEzLDUyMCA1MTAsNTIwQzUwNCw1MjIgNDg4LDUyOSA0NzIsNTM3QzQ2Nyw1NDAgNDYyLDU0MiA0NjEsNTQyQzQ2MSw1NDIgNDU4LDU0MyA0NTYsNTQ1QzQ1Myw1NDcgNDQ5LDU0OSA0NDYsNTUwQzQ0Myw1NTEgNDM4LDU1NCA0MzYsNTU2QzQzNCw1NTcgNDI5LDU2MCA0MjYsNTYyQzQwNCw1NzIgMzY4LDYwMiAzNjUsNjExQzM2Myw2MjEgMzkyLDY0MiA0MTgsNjQ4QzQyMyw2NTAgNDMwLDY1MiA0MzQsNjU0QzQ0OCw2NTkgNDk2LDY2MiA1NDAsNjU5Wk04OTUsNTg4Qzg5MCw1ODYgODg2LDU4MiA4ODMsNTc4Qzg4MSw1NzQgODgyLDU2MSA4ODQsNTU2Qzg4NSw1NTIgODg1LDU1MiA4ODYsNTYwQzg4Nyw1NzQgODg5LDU3OCA4OTgsNTg0QzkwMSw1ODYgOTAzLDU4OCA5MDIsNTg4QzkwMCw1ODkgODk5LDU4OSA4OTUsNTg4Wk05MTksNTQ5QzkxMiw1NDEgOTA4LDU0MCA5MDAsNTQ1Qzg5MCw1NTAgODg4LDU1MCA4ODksNTQ4Qzg5MSw1NDEgOTA3LDUzMyA5MTMsNTM3QzkxNCw1MzggOTE2LDUzOSA5MTksNTQwQzkyNSw1NDIgOTI5LDU0NiA5MjksNTUwQzkzMCw1NTcgOTI3LDU1NiA5MTksNTQ5Wk02MjQsNDQ0QzYyOCw0NDMgNjM4LDQ0MSA2NDYsNDQxQzY1NSw0NDAgNjcwLDQzNyA2ODEsNDM1QzY5MSw0MzMgNzA1LDQzMCA3MTIsNDI5QzcxOCw0MjkgNzI4LDQyNyA3MzQsNDI1Qzc0MSw0MjQgNzUzLDQyMiA3NjIsNDIxQzc4MCw0MTkgNzg2LDQxOCA3OTgsNDE0QzgwMiw0MTIgODA3LDQxMSA4MTEsNDExQzgyMCw0MDkgODMzLDQwNyA4NDQsNDA0Qzg1MSw0MDIgODYyLDQwMCA4NzEsMzk5Qzg5NiwzOTYgODk4LDM5NSA4OTgsMzg3Qzg5OCwzODMgODk3LDM4MSA4OTQsMzc3Qzg5MiwzNzQgODg5LDM3MCA4ODgsMzY4Qzg4MywzNTkgODY1LDMzOSA4NTEsMzI5Qzg0MiwzMjEgODI3LDMxNCA4MTUsMzEwQzgxMCwzMDggODAzLDMwNSA4MDAsMzA0Qzc4MywyOTggNzM5LDI5OSA3MjMsMzA3QzcyMCwzMDggNzE1LDMxMCA3MTEsMzExQzcwNywzMTIgNzAyLDMxNCA3MDAsMzE2QzY5NywzMTggNjkzLDMyMCA2OTIsMzIwQzY4MCwzMjUgNjUwLDM1MyA2NDAsMzY3QzYzMCwzODQgNjIzLDM5NiA2MjEsNDAzQzYxOSw0MDYgNjE3LDQxMyA2MTUsNDE3QzYwOSw0MzEgNjA5LDQ0MSA2MTQsNDQ0QzYxNyw0NDYgNjE3LDQ0NiA2MjQsNDQ0WiIgZmlsbD0iIzExMSIgZmlsbC1ydWxlPSJldmVub2RkIi8+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNzUwIDY5NCkgcm90YXRlKC0xMikgc2NhbGUoMS4wNSkiPgo8cGF0aCBkPSJNLTM2LDMgQy0yNiwtNSAtMTUsLTE1IC02LC0xMyBDLTMsLTEyIC0xLC0xMCAwLC04IEMxLC0xMCAzLC0xMiA2LC0xMyBDMTUsLTE1IDI2LC01IDM2LDMgQzI0LDUgMTIsMyAwLDUgQy0xMiwzIC0yNCw1IC0zNiwzWiIgZmlsbD0iIzljMGYyNyIvPgo8cGF0aCBkPSJNLTM0LDYgQy0yMiw4IC0xMCw3IDAsOCBDMTAsNyAyMiw4IDM0LDYgQzI3LDE5IDEzLDI1IDAsMjUgQy0xMywyNSAtMjcsMTkgLTM0LDZaIiBmaWxsPSIjYzIxNzNhIi8+CjxwYXRoIGQ9Ik0tMTIsMTUgQy02LDE4IDQsMTggMTAsMTUiIHN0cm9rZT0iI2U0NmE4MCIgc3Ryb2tlLXdpZHRoPSIzIiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiIG9wYWNpdHk9Ii43Ii8+CjxwYXRoIGQ9Ik0tMzcsMy41IEMtMjIsNyAyMiw3IDM3LDMuNSIgc3Ryb2tlPSIjNWUwODE1IiBzdHJva2Utd2lkdGg9IjIuNiIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CjwvZz48L3N2Zz4=" alt=""><span class="brand-name"><b>KHAWLA</b><span>صالون خوله للتجميل</span></span></a>
         <p style="margin-top:14px" data-k="f_tag">Beauty Salon &amp; Cosmetics, Bahrain.</p>
       </div>
-      <div><h4 data-k="m_name">Muharraq</h4><p><span class="tel" style="font-size:1.1rem">1733 1299</span><br><span data-k="m_hours">Daily, 8:30 AM – 8:00 PM</span></p></div>
-      <div><h4 data-k="d_name">Durrat Al Bahrain</h4><p><span class="tel" style="font-size:1.1rem">1700 0292</span><br><span data-k="d_hours">From 10:00 AM</span></p></div>
+      <div><h4 data-k="m_name">Muharraq</h4><p><span class="tel" style="font-size:1.1rem">1733 1299</span><br><span data-k="wa">WhatsApp</span> <span class="tel" style="font-size:1rem">3632 3231</span><br><span data-k="m_hours">Daily, 8:30 AM – 8:00 PM</span></p></div>
+      <div><h4 data-k="d_name">Durrat Al Bahrain</h4><p><span class="tel" style="font-size:1.1rem">1700 0292</span><br><span data-k="wa">WhatsApp</span> <span class="tel" style="font-size:1rem">3918 1810</span><br><span data-k="d_hours">From 10:00 AM</span></p></div>
     </div>
     <div class="legal"><span data-k="copy_r">© 2026 Khawla Beauty Salon &amp; Cosmetics</span><a href="https://www.instagram.com/khawlabeauty.bh/" target="_blank" rel="noopener">Instagram</a></div>
   </div>
 </footer>
 
 <div class="mbar">
-  <a class="btn" href="#book" data-k="h_cta1">Book an appointment</a>
+  <a class="btn wa-btn" href="#waform"><svg class="wa-ico" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.1 5.1 0 0 0 1.1 2.7 11.7 11.7 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.3c0-.1-.2-.2-.5-.3Z"/></svg><span data-k="wa_bar">Book on WhatsApp</span></a>
 </div>
 <div class="toast" id="toast" role="status" hidden></div>
 
@@ -495,6 +535,10 @@ q1:"هل أحتاج إلى حجز مسبق؟",a1:"ننصح بالحجز المس
 q2:"كم أسعار الخدمات؟",a2:"تختلف الأسعار حسب الخدمة وطول الشعر أو نوع الإطلالة، ونؤكد لك السعر عند الحجز حتى لا تكون هناك أي مفاجآت.",
 q3:"متى يجب على العروس الحجز؟",a3:"في أقرب وقت ممكن، حتى نرتب موعد التجربة ونحجز لك تاريخ مناسبتك.",
 q4:"هل الصالون للسيدات فقط؟",a4:"نعم، صالون خوله للتجميل مخصص للسيدات في كلا الفرعين.",
+wa:"واتساب",wa_eyebrow:"واتساب",wa_title:"احجزي عبر الواتساب",wa_lead:"اختاري الفرع والخدمة، وسيفتح الواتساب برسالتك جاهزة، وما عليكِ إلا الضغط على إرسال.",
+f_branch:"الفرع",f_service:"الخدمة",f_date:"اليوم المفضل",f_time:"الوقت المفضل",f_name:"اسمك",
+wa_send:"أرسلي عبر الواتساب",wa_hint:"نرد عليكِ لتأكيد الموعد والسعر.",wa_bar:"احجزي عبر الواتساب",
+hw1:"أرسلي طلبك عبر الواتساب، أو اتصلي بالفرع",bk_lead:"احجزي عبر الواتساب بضغطات قليلة، أو اتصلي بالفرع الأقرب إليك.",
 f_tag:"صالون تجميل ومستحضرات تجميل، مملكة البحرين.",copy_r:"© 2026 صالون خوله للتجميل ومستحضرات التجميل"
 };
 var MSG={en:{copied:"Number copied",copyfail:"Select the number to copy it"},ar:{copied:"تم نسخ الرقم",copyfail:"حددي الرقم لنسخه"}};
@@ -514,6 +558,34 @@ btn.addEventListener("click",function(){set(cur==="ar"?"en":"ar")});
 var start="en";try{start=localStorage.getItem("kb-lang")||"en"}catch(e){}
 if(location.hash==="#ar")start="ar";
 if(start==="ar")set("ar");
+var WA={m:"97336323231",d:"97339181810"};
+var SV=["c1a","c1b","c1c","c1d","c1e","c1f","c2a","c2b","c2c","c2d","c3a","c3b","c3c","c4a","c4b","c4c","c4d","b_br"];
+var X={en:{any:"Not sure yet, I'd like advice",b_br:"Bridal package",t0:"Any time",t1:"Morning",t2:"Afternoon",t3:"Evening",hi:"Hello Khawla Beauty, I'd like to book an appointment.",br:"Branch",sv:"Service",dy:"Preferred day",tm:"Preferred time",nm:"Name"},
+ar:{any:"لم أحدد بعد، أحتاج استشارة",b_br:"باقة العروس",t0:"أي وقت",t1:"صباحاً",t2:"بعد الظهر",t3:"مساءً",hi:"مرحباً صالون خوله، أرغب في حجز موعد.",br:"الفرع",sv:"الخدمة",dy:"اليوم المفضل",tm:"الوقت المفضل",nm:"الاسم"}};
+var fb=document.getElementById("f-branch"),fs=document.getElementById("f-service"),fd=document.getElementById("f-date"),ft=document.getElementById("f-time"),fn=document.getElementById("f-name"),send=document.getElementById("wa-send");
+var tz=new Date();fd.min=tz.getFullYear()+"-"+String(tz.getMonth()+1).padStart(2,"0")+"-"+String(tz.getDate()).padStart(2,"0");
+function txt(h){var t=document.createElement("div");t.innerHTML=h;return t.textContent}
+function fill(){
+  var x=X[cur],d=cur==="ar"?AR:EN,sv=fs.value,tv=ft.value;
+  fs.innerHTML="";var o=new Option(x.any,"");fs.add(o);
+  SV.forEach(function(k){fs.add(new Option(txt(d[k]||x[k]||X.en[k]),k))});
+  fs.value=sv||"";
+  ft.innerHTML="";["t0","t1","t2","t3"].forEach(function(k){ft.add(new Option(x[k],k))});ft.value=tv||"t0";
+  link();
+}
+function link(){
+  var x=X[cur],L=[x.hi];
+  L.push(x.br+": "+fb.options[fb.selectedIndex].textContent);
+  L.push(x.sv+": "+fs.options[fs.selectedIndex].textContent);
+  if(fd.value){var p=fd.value.split("-"),dt=new Date(+p[0],p[1]-1,+p[2]);L.push(x.dy+": "+dt.toLocaleDateString(cur==="ar"?"ar-BH":"en-GB",{weekday:"long",day:"numeric",month:"long"}))}
+  if(ft.value!=="t0")L.push(x.tm+": "+ft.options[ft.selectedIndex].textContent);
+  if(fn.value.trim())L.push(x.nm+": "+fn.value.trim());
+  send.href="https://wa.me/"+WA[fb.value]+"?text="+encodeURIComponent(L.join("\n"));
+}
+[fb,fs,fd,ft].forEach(function(e){e.addEventListener("change",link)});fn.addEventListener("input",link);
+document.getElementById("waform").addEventListener("submit",function(e){e.preventDefault()});
+btn.addEventListener("click",fill);
+fill();
 var toast=document.getElementById("toast"),tt;
 function say(t){toast.textContent=t;toast.hidden=false;clearTimeout(tt);tt=setTimeout(function(){toast.hidden=true},2200)}
 document.querySelectorAll("[data-copy]").forEach(function(b){

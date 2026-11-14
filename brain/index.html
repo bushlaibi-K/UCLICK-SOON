@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brain · U Click</title>
+<meta name="description" content="Brain — a free learning game for kids aged 4 to 12: math, science, Arabic, English, logic and learning to read, in Arabic and English.">
+<meta property="og:title" content="Brain · U Click">
+<meta property="og:description" content="Learning levels for kids aged 4 to 12, in Arabic and English.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://uclick.bh/brain/">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg1:#1d2b64; --bg2:#3a6073; --card:#ffffff; --ink:#22304a; --muted:#6b7890;
+    --math:#ff8a3d; --sci:#27b97c; --eng:#3f8cff; --logic:#a45cf0; --ara:#e25588;
+    --ok:#27b97c; --bad:#f25f6b; --gold:#ffc83d; --lock:#c5ccd8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Trebuchet MS","Cairo","Segoe UI",Tahoma,system-ui,sans-serif;color:var(--ink);
+    background:linear-gradient(165deg,var(--bg1),var(--bg2));min-height:100vh;padding:14px;display:flex;justify-content:center}
+  html[lang="ar"] body{font-family:"Cairo","Segoe UI",Tahoma,system-ui,sans-serif}
+  .app{width:100%;max-width:760px}
+  header{display:flex;align-items:center;justify-content:space-between;color:#fff;margin-bottom:12px;gap:8px;flex-wrap:wrap}
+  header h1{font-size:1.5rem;letter-spacing:.5px}
+  header .tools{display:flex;gap:6px;flex-wrap:wrap}
+  .card{background:var(--card);border-radius:22px;padding:18px;margin-bottom:14px;box-shadow:0 8px 22px rgba(0,0,0,.22)}
+  .hidden{display:none!important}
+  button{font-family:inherit;cursor:pointer;border:none}
+  .btn{border-radius:14px;padding:11px 16px;font-size:1rem;font-weight:bold;background:#e9eef7;color:var(--ink)}
+  .btn.primary{background:var(--gold);color:#3b2c00}
+  .btn.ghost{background:rgba(255,255,255,.18);color:#fff}
+  .btn.danger{background:#fde3e5;color:#b3202e}
+  .btn:focus-visible,.opt:focus-visible,.subj:focus-visible,.chip:focus-visible,.kid:focus-visible{outline:4px solid var(--gold);outline-offset:2px}
+  h2{font-size:1.25rem;margin-bottom:10px}
+  p.sub{color:var(--muted);margin-bottom:12px}
+  .kids{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px}
+  .kid{background:#f3f6fc;border-radius:18px;padding:14px 8px;text-align:center;font-size:1rem;font-weight:bold;color:var(--ink)}
+  .kid .av{font-size:2.6rem;display:block}
+  .kid small{display:block;color:var(--muted);font-weight:normal;margin-top:2px}
+  .form label{display:block;font-weight:bold;margin:10px 0 6px}
+  .form input{width:100%;padding:12px;border-radius:12px;border:2px solid #d5dcea;font-size:1.1rem;font-family:inherit}
+  .ages,.avs{display:flex;flex-wrap:wrap;gap:8px}
+  .pick{min-width:46px;padding:10px;border-radius:12px;background:#eef2f9;font-size:1.1rem;font-weight:bold;color:var(--ink)}
+  .pick.on{background:var(--gold)}
+  .who{display:flex;align-items:center;gap:12px}
+  .who .av{font-size:2.8rem}
+  .badge{display:inline-block;border-radius:999px;padding:4px 12px;font-size:.85rem;font-weight:bold;background:#e7f7ef;color:#127a4c;margin-top:4px}
+  .badge.up{background:#fff3cf;color:#8a6100}
+  .chips{display:flex;gap:8px;overflow-x:auto;padding:6px 2px 10px}
+  .chip{flex:0 0 auto;border-radius:16px;padding:10px 14px;font-weight:bold;background:#eef2f9;color:var(--ink);text-align:center;min-width:92px}
+  .chip small{display:block;font-weight:normal;color:var(--muted);font-size:.75rem}
+  .chip.sel{background:var(--ink);color:#fff}.chip.sel small{color:#cfd8ea}
+  .chip.locked{background:#f1f3f7;color:#a3acbb}
+  .subjects{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  .subj{border-radius:20px;padding:18px 10px;color:#fff;font-size:1.15rem;font-weight:bold;text-align:center}
+  .subj:last-child:nth-child(odd){grid-column:1 / -1}
+  .subj .ic{font-size:2.4rem;display:block;margin-bottom:4px}
+  .subj small{display:block;font-weight:normal;opacity:.95;margin-top:4px}
+  .bar{height:14px;background:#e6ebf4;border-radius:10px;overflow:hidden;margin:10px 0 16px}
+  .bar div{height:100%;background:var(--ok);width:0;transition:width .3s}
+  .q{font-size:1.7rem;font-weight:bold;text-align:center;margin:8px 0 18px;line-height:1.5;word-break:break-word}
+  .opts{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  .opts.long{grid-template-columns:1fr}
+  .opt{border-radius:18px;padding:18px 10px;font-size:1.6rem;font-weight:bold;background:#eef2f9;color:var(--ink);min-height:74px}
+  .opts.long .opt{font-size:1.15rem;padding:16px 12px}
+  .opt.right{background:var(--ok);color:#fff}
+  .opt.wrong{background:var(--bad);color:#fff}
+  .fb{min-height:2rem;text-align:center;font-size:1.25rem;font-weight:bold;margin-top:14px}
+  .center{text-align:center}
+  .big{font-size:4rem}
+  .row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:14px}
+  .rep{border:2px solid #e6ebf4;border-radius:18px;padding:14px;margin-bottom:12px}
+  .rep h3{font-size:1.15rem}
+  .line{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid #eef1f6;font-size:.95rem}
+  .line:last-child{border-bottom:none}
+  .line b{white-space:nowrap}
+  .line small{color:var(--muted)}
+  .ladder{display:flex;gap:4px;margin:10px 0}
+  .ladder span{flex:1;height:12px;border-radius:6px;background:#e6ebf4}
+  .ladder span.done{background:var(--ok)}
+  .ladder span.now{background:var(--gold)}
+  .ladder span.age{outline:2px solid var(--ink);outline-offset:1px}
+  .note{font-size:.85rem;color:var(--muted);margin-top:8px}
+  .opt.reading{outline:5px solid var(--gold);outline-offset:2px;background:#fff6d6}
+  .speak{font-size:1.8rem;width:64px;height:64px;border-radius:50%;background:var(--gold);box-shadow:0 4px 0 #d9a520}
+  .mascot{display:flex;align-items:center;gap:10px;margin-top:14px;min-height:64px}
+  .mascot .owl{font-size:2.6rem}
+  .bubble{flex:1;background:#f3f6fc;border-radius:16px;padding:10px 12px;margin-top:0;min-height:48px;text-align:start}
+  .stickers{display:flex;flex-wrap:wrap;gap:8px;font-size:2rem}
+  .readBtn{display:block;width:100%;border-radius:22px;padding:18px;margin-bottom:14px;font-size:1.3rem;font-weight:bold;color:#3b2c00;background:linear-gradient(90deg,#ffd76a,#ffb347);box-shadow:0 8px 22px rgba(0,0,0,.22)}
+  .steps{display:grid;gap:10px}
+  .step{border-radius:16px;padding:16px;font-size:1.15rem;font-weight:bold;background:#eef2f9;color:var(--ink);text-align:start}
+  .tokens{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:18px 0 10px}
+  .tok{font-size:2.6rem;font-weight:bold;min-width:70px;padding:14px 16px;border-radius:18px;background:#eef2f9;color:var(--ink)}
+  .tok:active{background:var(--gold)}
+  .lsub{font-size:2rem;min-height:2.6rem;margin-bottom:6px}
+  .confetti{position:fixed;top:-40px;font-size:1.8rem;animation:fall 2.4s linear forwards;pointer-events:none;z-index:9}
+  @keyframes fall{to{transform:translateY(110vh) rotate(360deg)}}
+  @media (prefers-reduced-motion:reduce){.confetti{display:none}}
+  @media (max-width:420px){.q{font-size:1.4rem}.opt{font-size:1.35rem}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>🧠 <span data-t="title"></span></h1>
+    <div class="tools">
+      <button class="btn ghost" id="soundBtn"></button>
+      <button class="btn ghost" id="langBtn"></button>
+      <button class="btn ghost hidden" id="switchBtn"></button>
+      <button class="btn ghost" id="parentBtn"></button>
+    </div>
+  </header>
+
+  <section id="sProfiles">
+    <div class="card">
+      <h2 data-t="who"></h2>
+      <div class="kids" id="kidList"></div>
+    </div>
+  </section>
+
+  <section id="sNew" class="hidden">
+    <div class="card form">
+      <h2 data-t="addChild"></h2>
+      <label for="nameIn" data-t="name"></label>
+      <input id="nameIn" maxlength="14" autocomplete="off">
+      <label data-t="age"></label>
+      <div class="ages" id="agePick"></div>
+      <label data-t="face"></label>
+      <div class="avs" id="avPick"></div>
+      <div class="row">
+        <button class="btn" id="cancelNew" data-t="cancel"></button>
+        <button class="btn primary" id="saveNew" data-t="start"></button>
+      </div>
+      <div class="fb" id="newMsg" style="font-size:1rem;color:#b3202e"></div>
+    </div>
+  </section>
+
+  <section id="sHome" class="hidden">
+    <div class="card">
+      <div class="who">
+        <span class="av" id="hAv"></span>
+        <div>
+          <h2 id="hName" style="margin:0"></h2>
+          <span class="badge" id="hBadge"></span> <span class="badge up hidden" id="hStreak"></span>
+        </div>
+      </div>
+    </div>
+    <button class="readBtn" id="readBtn" data-t="readBtn"></button>
+    <div class="card">
+      <h2 data-t="levels"></h2>
+      <div class="chips" id="chips"></div>
+      <p class="sub" id="stageHint"></p>
+      <div class="subjects" id="subjects"></div>
+    </div>
+    <div class="card"><h2 id="stTitle"></h2><div class="stickers" id="stickers"></div><p class="sub hidden" id="stNone" data-t="noStickers" style="margin:0"></p></div>
+  </section>
+
+  <section id="sPlay" class="hidden">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+        <b id="pTitle"></b><span id="pCount" style="color:var(--muted)" dir="ltr"></span>
+      </div>
+      <div class="bar"><div id="pBar"></div></div>
+      <div class="center"><button class="speak hidden" id="sayBtn" aria-label="Listen">🔊</button></div>
+      <div class="q" id="pQ"></div>
+      <div class="opts" id="pOpts"></div>
+      <div class="mascot"><span class="owl">🦉</span><div class="fb bubble" id="pFb"></div></div>
+    </div>
+    <div class="center"><button class="btn ghost" id="quitBtn" data-t="back"></button></div>
+  </section>
+
+  <section id="sResult" class="hidden">
+    <div class="card center">
+      <div class="big" id="rEmoji"></div>
+      <h2 id="rTitle"></h2>
+      <div id="rStars" style="font-size:2rem"></div>
+      <p id="rDetail"></p>
+      <p id="rExtra" style="margin-top:10px;font-weight:bold;color:#8a6100"></p>
+      <div class="row">
+        <button class="btn" id="rAgain" data-t="again"></button>
+        <button class="btn primary" id="rHome" data-t="toLevels"></button>
+      </div>
+    </div>
+  </section>
+
+  <section id="sRead" class="hidden">
+    <div class="card">
+      <h2 data-t="readTitle"></h2>
+      <div class="ages" id="rdTabs" style="margin-bottom:12px"></div>
+      <p class="sub" id="rdNote"></p>
+      <div class="steps" id="rdSteps"></div>
+    </div>
+    <div class="center"><button class="btn ghost" id="rdBack" data-t="back"></button></div>
+  </section>
+
+  <section id="sLesson" class="hidden">
+    <div class="card center">
+      <div style="display:flex;justify-content:space-between;gap:8px"><b id="lTitle"></b><span id="lCount" dir="ltr" style="color:var(--muted)"></span></div>
+      <div class="tokens" id="lTokens"></div>
+      <div class="lsub" id="lSub"></div>
+      <div class="row">
+        <button class="btn" id="lPrev" data-t="prev"></button>
+        <button class="speak" id="lSay" aria-label="Listen">🔊</button>
+        <button class="btn" id="lNext" data-t="nextC"></button>
+      </div>
+      <div class="row"><button class="btn primary" id="lGame" data-t="listenGame"></button></div>
+    </div>
+    <div class="center"><button class="btn ghost" id="lBack" data-t="back"></button></div>
+  </section>
+
+  <section id="sGate" class="hidden">
+    <div class="card center">
+      <h2 data-t="parentsOnly"></h2>
+      <p class="sub" data-t="gateHint"></p>
+      <div class="q" id="gQ" dir="ltr"></div>
+      <div class="opts" id="gOpts"></div>
+      <div class="row"><button class="btn" id="gBack" data-t="back"></button></div>
+    </div>
+  </section>
+
+  <section id="sParent" class="hidden">
+    <div class="card">
+      <h2 data-t="report"></h2>
+      <p class="sub" data-t="reportHint"></p>
+      <div id="reports"></div>
+      <p class="note" data-t="deviceNote"></p>
+      <div class="row"><button class="btn primary" id="pBack" data-t="done"></button></div>
+    </div>
+  </section>
+</div>
+
+<script>
+/* ================= SETTINGS ================= */
+const STAGES = 9;              // stage 1 = age 4 ... stage 9 = age 12
+const ROUND = 8, PASS = 6;
+const KEY = "brainClimbV1";
+const SUBJ = [
+  {id:"math",  ic:"🔢", col:"var(--math)"},
+  {id:"sci",   ic:"🔬", col:"var(--sci)"},
+  {id:"ara",   ic:"📜", col:"var(--ara)"},
+  {id:"eng",   ic:"📖", col:"var(--eng)"},
+  {id:"logic", ic:"🧩", col:"var(--logic)"}
+];
+const AVATARS = ["🦁","🐼","🦊","🐯","🐸","🦄","🐵","🐧","🚀","⭐"];
+const STICKERS = Array.from("🦋🐢🦜🐬🦒🐙🦔🐝🦉🐳🦕🐞🦩🐿🦚🐠🦘🐨🦭🐧🦊🐯🐼🦁🐸🦄🐵🚀🌈🎈🏅🎨🎸⚽🏀🚲🛴🪁🎯🧸🪀🎺🥁🏆👑");
+const ageOf = s => s + 3;
+const stageOfAge = a => Math.max(1, Math.min(STAGES, a - 3));
+
+/* ================= LANGUAGE ================= */
+let LANG = "en";
+const arYears = n => n===1 ? "سنة واحدة" : n===2 ? "سنتين" : n+" سنوات";
+const TXT = {
+en:{
+  title:"Brain", langBtn:"🌐 عربي", switchK:"👧 Switch", parents:"👨‍👩‍👧 Parents",
+  who:"Who is playing?", addChild:"Add a child", name:"Name", age:"Age", face:"Pick a face", cancel:"Cancel", start:"Start ▶",
+  needName:"Please type a name.", needAge:"Please pick an age.", ageN:a=>"Age "+a, levels:"Levels",
+  levelN:s=>"Level "+s, myAge:" · my age", back:"⬅ Back", again:"🔁 Play again", toLevels:"🗺 Levels",
+  s_math:"Math", s_sci:"Science", s_ara:"Arabic", s_eng:"English", s_logic:"Logic",
+  lockedHint:s=>"🔒 Pass all "+SUBJ.length+" subjects in Level "+(s-1)+" to open Level "+s+".",
+  passedHint:s=>"✅ Level "+s+" passed! Play again to practice, or try the next level.",
+  todoHint:n=>"Score "+PASS+" out of "+ROUND+" in all "+SUBJ.length+" subjects to open the next level. Passed: "+n+" of "+SUBJ.length+".",
+  sPassed:sc=>"✅ Passed · best "+sc+"/"+ROUND, sTry:sc=>"Best "+sc+"/"+ROUND+" · try again", sNew:"Tap to play",
+  good:["🎉 Great job!","⭐ Correct!","👏 Well done!","💪 Yes!"], answerIs:a=>"The answer is "+a,
+  youPassed:"You passed!", almost:"Almost there!",
+  got:(s,p)=>"You got "+s+" out of "+ROUND+"."+(p?"":" Get "+PASS+" to pass. Try again!"),
+  opened:(s,a)=>"🔓 Level "+s+" (Age "+a+") is now open!", above:" You are learning above your age! 🚀",
+  champion:"🎓 You finished every level. You are an expert champion!", stillLeft:l=>"Still to pass in this level: "+l,
+  workingAt:a=>"Working at Age "+a+" level", champ:"🏆 Expert champion",
+  ahead:n=>" · "+n+" year"+(n>1?"s":"")+" ahead of age", onTrack:" · on track",
+  parentsOnly:"Parents only", gateHint:"Answer to open the progress report", report:"Progress report", done:"Done",
+  reportHint:"Each level matches a school age, from age 4 (beginner) to age 12 (expert). A child passes a level by scoring "+PASS+" out of "+ROUND+" or more in all "+SUBJ.length+" subjects.",
+  deviceNote:"Progress is saved on this device only.", noKids:"No children added yet.",
+  ladderNote:"Green = level passed · yellow = working on it · outlined = the level for the child's age",
+  fully:"Levels fully passed", ofN:(a,b)=>a+" of "+b, answered:"Questions answered", correct:"% correct",
+  topPassed:(s,a)=>"Highest level passed: Level "+s+" (Age "+a+")", nonePassed:"No level passed yet",
+  curBest:sc=>" · current level best "+sc+"/"+ROUND, lastPlayed:"Last played", notYet:"Not yet",
+  remove:"Remove child", removeSure:"Tap again to remove",
+  soundOn:"🔊", soundOff:"🔇", reviewTitle:"🔁 Let's try these again", stickers:n=>"My stickers ("+n+")",
+  noStickers:"Pass a subject to win your first sticker!", streak:n=>"🔥 "+n+" day"+(n>1?"s":"")+" in a row", newSticker:x=>" New sticker: "+x,
+  answerSay:"The answer is", lookSay:"Look at the green one",
+  readBtn:"📚 Learn to read", readTitle:"Learn to read", readHint:"Pick a step. Listen, tap the letters and words to hear them, then play the listening game.",
+  noVoice:"Voice is not available in this browser. Read the cards together with your child.",
+  rs1:"Letters", rs2:"Build words", rs3:"Common words", rs4:"Sentences", tapHear:"Tap what you hear",
+  listenGame:"🎧 Listening game", prev:"◀ Back", nextC:"Next ▶", backRead:"📚 Reading",
+  gotN:(a,n,p)=>"You got "+a+" out of "+n+"."+(p?"":" Listen again and try once more!"), stepDone:"✅ Step complete!",
+  readSteps:"Reading steps done", stickersLbl:"Stickers won", streakLbl:"Days in a row",
+  mw:{plus:" plus ", minus:" minus ", times:" times ", div:" divided by ", eq:" equals what?", sq:" squared", blank:" blank "},
+  howMany:"How many?", next:"What comes next?", fracOf:(b,a)=>"What is 1/"+b+" of "+a+"?",
+  pct:(a,b)=>a+"% of "+b+" = ?", xeq:(a,b)=>"x + "+a+" = "+b+"\nWhat is x?"
+},
+ar:{
+  title:"Brain", langBtn:"🌐 English", switchK:"👧 تبديل", parents:"👨‍👩‍👧 الأهل",
+  who:"من يلعب؟", addChild:"إضافة طفل", name:"الاسم", age:"العمر", face:"اختر صورة", cancel:"إلغاء", start:"ابدأ ▶",
+  needName:"اكتب الاسم من فضلك.", needAge:"اختر العمر من فضلك.", ageN:a=>"عمر "+a, levels:"المستويات",
+  levelN:s=>"المستوى "+s, myAge:" · عمري", back:"رجوع", again:"🔁 العب مرة أخرى", toLevels:"🗺 المستويات",
+  s_math:"الرياضيات", s_sci:"العلوم", s_ara:"اللغة العربية", s_eng:"الإنجليزية", s_logic:"المنطق",
+  lockedHint:s=>"🔒 انجح في كل المواد في المستوى "+(s-1)+" لفتح المستوى "+s+".",
+  passedHint:s=>"✅ نجحت في المستوى "+s+"! العب مرة أخرى للتدرّب أو جرّب المستوى التالي.",
+  todoHint:n=>"احصل على "+PASS+" من "+ROUND+" في كل المواد لفتح المستوى التالي. نجحت في "+n+" من "+SUBJ.length+".",
+  sPassed:sc=>"✅ ناجح · أفضل نتيجة "+sc+"/"+ROUND, sTry:sc=>"أفضل نتيجة "+sc+"/"+ROUND+" · حاول مرة أخرى", sNew:"اضغط للعب",
+  good:["🎉 أحسنت!","⭐ إجابة صحيحة!","👏 ممتاز!","💪 رائع!"], answerIs:a=>"الإجابة الصحيحة: "+a,
+  youPassed:"نجحت!", almost:"اقتربت من النجاح!",
+  got:(s,p)=>"أجبت "+s+" من "+ROUND+" إجابات صحيحة."+(p?"":" تحتاج "+PASS+" للنجاح. حاول مرة أخرى!"),
+  opened:(s,a)=>"🔓 فُتح المستوى "+s+" (عمر "+a+")!", above:" أنت تتعلّم فوق مستوى عمرك! 🚀",
+  champion:"🎓 أنهيت كل المستويات. أنت بطل خبير!", stillLeft:l=>"بقي للنجاح في هذا المستوى: "+l,
+  workingAt:a=>"يتعلّم في مستوى عمر "+a, champ:"🏆 بطل خبير",
+  ahead:n=>" · متقدّم على عمره بـ"+arYears(n), onTrack:" · مناسب لعمره",
+  parentsOnly:"للأهل فقط", gateHint:"أجب لفتح تقرير التقدّم", report:"تقرير التقدّم", done:"تم",
+  reportHint:"كل مستوى يقابل عمراً دراسياً، من عمر 4 (مبتدئ) إلى عمر 12 (خبير). ينجح الطفل في المستوى عندما يحصل على "+PASS+" من "+ROUND+" أو أكثر في كل المواد.",
+  deviceNote:"التقدّم محفوظ على هذا الجهاز فقط.", noKids:"لم يُضف أي طفل بعد.",
+  ladderNote:"أخضر = مستوى ناجح · أصفر = يعمل عليه الآن · بإطار = مستوى عمر الطفل",
+  fully:"المستويات المكتملة", ofN:(a,b)=>a+" من "+b, answered:"الأسئلة المُجابة", correct:"% صحيحة",
+  topPassed:(s,a)=>"أعلى مستوى ناجح: المستوى "+s+" (عمر "+a+")", nonePassed:"لم ينجح في أي مستوى بعد",
+  curBest:sc=>" · أفضل نتيجة في المستوى الحالي "+sc+"/"+ROUND, lastPlayed:"آخر لعب", notYet:"لم يلعب بعد",
+  remove:"حذف الطفل", removeSure:"اضغط مرة أخرى للحذف",
+  soundOn:"🔊", soundOff:"🔇", reviewTitle:"🔁 لنحاول هذه مرة أخرى", stickers:n=>"ملصقاتي ("+n+")",
+  noStickers:"انجح في مادة لتفوز بأول ملصق!", streak:n=>"🔥 "+(n===1?"يوم واحد":n===2?"يومان متتاليان":n<=10?n+" أيام متتالية":n+" يوماً متتالياً"), newSticker:x=>" ملصق جديد: "+x,
+  answerSay:"الإجابة الصحيحة هي", lookSay:"انظر إلى الإجابة الخضراء",
+  readBtn:"📚 تعلّم القراءة", readTitle:"تعلّم القراءة", readHint:"اختر خطوة. استمع واضغط على الحروف والكلمات لتسمعها، ثم العب لعبة الاستماع.",
+  noVoice:"الصوت غير متوفر في هذا المتصفح. اقرأ البطاقات مع طفلك.",
+  rs1:"الحروف", rs2:"تركيب الكلمات", rs3:"كلمات شائعة", rs4:"الجمل", tapHear:"اضغط على ما تسمعه",
+  listenGame:"🎧 لعبة الاستماع", prev:"السابق", nextC:"التالي", backRead:"📚 القراءة",
+  gotN:(a,n,p)=>"أجبت "+a+" من "+n+" إجابات صحيحة."+(p?"":" استمع مرة أخرى وحاول من جديد!"), stepDone:"✅ أكملت الخطوة!",
+  readSteps:"خطوات القراءة المكتملة", stickersLbl:"الملصقات", streakLbl:"أيام متتالية",
+  mw:{plus:" زائد ", minus:" ناقص ", times:" ضرب ", div:" تقسيم ", eq:" يساوي كم؟", sq:" تربيع", blank:" فراغ "},
+  howMany:"كم العدد؟", next:"ماذا يأتي بعد ذلك؟", fracOf:(b,a)=>"كم يساوي 1/"+b+" من "+a+"؟",
+  pct:(a,b)=>"كم يساوي "+a+"% من "+b+"؟", xeq:(a,b)=>"س + "+a+" = "+b+"\nما قيمة س؟"
+}};
+const t = k => TXT[LANG][k];
+
+/* ================= HELPERS ================= */
+const $ = id => document.getElementById(id);
+const R = (a,b) => Math.floor(Math.random()*(b-a+1))+a;
+const pick = arr => arr[R(0,arr.length-1)];
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=R(0,i);[a[i],a[j]]=[a[j],a[i]];}return a;}
+function numOpts(ans, spread, allowNeg){
+  const set = new Set([ans]); let guard = 0;
+  while(set.size < 4 && guard++ < 200){
+    let d = R(1, Math.max(2, spread)); if(Math.random()<.5) d = -d;
+    const v = Math.round((ans + d)*100)/100;
+    if(v < 0 && !allowNeg) continue;
+    set.add(v);
+  }
+  let n = 1; while(set.size < 4){ set.add(ans + spread + n++); }
+  return shuffle([...set]);
+}
+const Q = (q,a,opts) => ({q, a:String(a), opts:opts.map(String)});
+const uniq4 = (list, ans) => shuffle([...new Set(list.map(String))].slice(0,4));
+
+/* ================= VOICE ================= */
+let ttsNS=null, synth=null, speakTok=0, actx=null;
+try{ synth = window.speechSynthesis || null; }catch(e){}
+const voiceReady = () => !!(ttsNS || synth);
+const soundOn = () => data.sound !== false;
+function cleanSay(x, lg){
+  return String(x).replace(/[\p{Extended_Pictographic}\u{FE0F}\u{200D}]/gu," ").replace(/_{2,}/g, TXT[lg||LANG].mw.blank)
+    .replace(/\s+/g," ").replace(/([\s.,،]*)$/,"").trim();
+}
+function mathSay(x, lg){ const w=TXT[lg].mw;
+  return x.replace(/\s*=\s*\?/g,w.eq).replace(/\s*\+\s*/g,w.plus).replace(/\s*−\s*/g,w.minus).replace(/\s*×\s*/g,w.times).replace(/\s*÷\s*/g,w.div).replace(/²/g,w.sq); }
+function markReading(id){ document.querySelectorAll("#pOpts .opt").forEach((b,i)=>b.classList.toggle("reading", id==="o"+i)); }
+function pickVoice(lg){ try{ return synth.getVoices().find(v=>v.lang && v.lang.toLowerCase().startsWith(lg)) || null; }catch(e){ return null; } }
+function speak(lines){
+  lines = lines.filter(l=>l && l.text); if(!lines.length || !voiceReady()) return;
+  const tok=++speakTok; markReading(null);
+  if(ttsNS){
+    try{
+      ttsNS.speak(lines.map(l=>{ const o={text:l.text, language:l.lang, rate:0.9}; if(l.id) o.id=l.id; return o; }), {voice:"rounded"})
+        .then(()=>{ if(tok===speakTok) markReading(null); })
+        .catch(e=>{ if(tok===speakTok) markReading(null); if(e && e.code==="not_granted"){ ttsNS=null; } });
+    }catch(e){}
+    return;
+  }
+  try{
+    synth.cancel();
+    lines.forEach((l,i)=>{ const u=new SpeechSynthesisUtterance(l.text); u.lang = l.lang==="ar" ? "ar-SA" : "en-US"; u.rate=0.85;
+      const v=pickVoice(l.lang); if(v) u.voice=v;
+      u.onstart=()=>{ if(tok===speakTok) markReading(l.id||null); };
+      if(i===lines.length-1) u.onend=()=>{ if(tok===speakTok) markReading(null); };
+      synth.speak(u); });
+  }catch(e){}
+}
+function stopSpeak(){ speakTok++; markReading(null); try{ if(ttsNS) ttsNS.stop(); else if(synth) synth.cancel(); }catch(e){} }
+function beep(ok){
+  if(!soundOn()) return;
+  try{ actx = actx || new (window.AudioContext||window.webkitAudioContext)();
+    const o=actx.createOscillator(), g=actx.createGain(), n=actx.currentTime; o.connect(g); g.connect(actx.destination); o.type="sine";
+    if(ok){ o.frequency.setValueAtTime(660,n); o.frequency.setValueAtTime(880,n+.12); } else o.frequency.setValueAtTime(220,n);
+    g.gain.setValueAtTime(.15,n); g.gain.exponentialRampToValueAtTime(.001,n+.3); o.start(n); o.stop(n+.32);
+  }catch(e){}
+}
+function confetti(){
+  for(let i=0;i<26;i++){ const c=document.createElement("span"); c.className="confetti"; c.textContent=pick(["🎉","⭐","🎈","✨","🌟"]);
+    c.style.left=R(0,95)+"vw"; c.style.animationDelay=(R(0,8)/10)+"s"; document.body.appendChild(c); setTimeout(()=>c.remove(),3600); }
+}
+
+/* ================= LEARN TO READ: lesson cards ================= */
+const EN_L="A:apple:🍎,B:ball:⚽,C:cat:🐱,D:dog:🐶,E:egg:🥚,F:fish:🐟,G:goat:🐐,H:hat:🎩,I:insect:🐞,J:juice:🧃,K:kite:🪁,L:lion:🦁,M:moon:🌙,N:nest:🪺,O:orange:🍊,P:pig:🐷,Q:queen:👑,R:rabbit:🐰,S:sun:☀️,T:tree:🌳,U:umbrella:☂️,V:van:🚐,W:water:💧,X:box:📦,Y:yo-yo:🪀,Z:zebra:🦓".split(",").map(x=>x.split(":"));
+const AR_L="أ:ألف:أسد:🦁,ب:باء:بطة:🦆,ت:تاء:تفاح:🍎,ث:ثاء:ثعلب:🦊,ج:جيم:جمل:🐪,ح:حاء:حصان:🐴,خ:خاء:خروف:🐑,د:دال:دب:🐻,ذ:ذال:ذرة:🌽,ر:راء:ريشة:🪶,ز:زاي:زرافة:🦒,س:سين:سمكة:🐟,ش:شين:شمس:☀️,ص:صاد:صقر:🦅,ض:ضاد:ضفدع:🐸,ط:طاء:طائرة:✈️,ظ:ظاء:ظرف:✉️,ع:عين:عنب:🍇,غ:غين:غيمة:☁️,ف:فاء:فيل:🐘,ق:قاف:قمر:🌙,ك:كاف:كتاب:📖,ل:لام:ليمون:🍋,م:ميم:موز:🍌,ن:نون:نحلة:🐝,هـ:هاء:هدية:🎁,و:واو:وردة:🌹,ي:ياء:يد:✋".split(",").map(x=>x.split(":"));
+const AR_NAME={"ا":"ألف","ه":"هاء"}; AR_L.forEach(r=>AR_NAME[r[0]]=r[1]);
+const EN_W=[["cat","🐱"],["dog","🐶"],["sun","☀️"],["hat","🎩"],["pig","🐷"],["bus","🚌"],["bed","🛏️"],["cup","🥤"],["fox","🦊"],["hen","🐔"]];
+const AR_W=[["باب","🚪"],["بيت","🏠"],["قلم","✏️"],["ولد","👦"],["بنت","👧"],["شمس","☀️"],["قمر","🌙"],["موز","🍌"],["سمك","🐟"],["كتاب","📖"]];
+const EN_S=["the","is","a","I","see","my","and","go","can","we","you","like"];
+const AR_S=["أنا","هذا","هذه","في","من","إلى","هو","هي","ماما","بابا"];
+const EN_T=["I see a cat.","The sun is hot.","I like my dog.","We can go.","The pig is big."];
+const AR_T=["هذا باب.","أنا أحب أمي.","الشمس مشرقة.","الولد يقرأ كتاباً.","القطة تشرب الحليب."];
+const wordCards=(list,lg)=>list.map(([w,e])=>({tokens:Array.from(w).map(ch=>({txt:ch, say: lg==="ar" ? (AR_NAME[ch]||ch) : ch.toUpperCase()})), sub:e+" "+w, all:[w]}));
+const oneCards=list=>list.map(w=>({tokens:[{txt:w,say:w}], sub:"", all:[w]}));
+const sentCards=list=>list.map(x=>({tokens:x.replace(/\./g,"").split(" ").map(w=>({txt:w,say:w})), sub:"", all:[x]}));
+const selfPool=list=>list.map(w=>({show:w, say:w}));
+const READ={
+  en:[
+    {cards:EN_L.map(([L,w,e])=>({tokens:[{txt:L+" "+L.toLowerCase(), say:L}], sub:e+" "+w, all:[L,w]})), pool:EN_L.map(([L,w])=>({show:L, say:L+", as in "+w}))},
+    {cards:wordCards(EN_W,"en"), pool:selfPool(EN_W.map(x=>x[0]))},
+    {cards:oneCards(EN_S), pool:selfPool(EN_S)},
+    {cards:sentCards(EN_T), pool:selfPool(EN_T)}
+  ],
+  ar:[
+    {cards:AR_L.map(([L,n,w,e])=>({tokens:[{txt:L, say:n}], sub:e+" "+w, all:[n,w]})), pool:AR_L.map(([L,n,w])=>({show:L, say:n+"، "+w}))},
+    {cards:wordCards(AR_W,"ar"), pool:selfPool(AR_W.map(x=>x[0]))},
+    {cards:oneCards(AR_S), pool:selfPool(AR_S)},
+    {cards:sentCards(AR_T), pool:selfPool(AR_T)}
+  ]
+};
+
+/* ================= MATH (made fresh every round) ================= */
+const THINGS = ["🍎","⭐","🐟","⚽","🌸","🚗","🍪","🎈"];
+function genMath(s){
+  let a,b,c,r,k;
+  switch(s){
+    case 1: a=R(1,5); return Q(t("howMany")+"\n"+pick(THINGS).repeat(a), a, numOpts(a,2));
+    case 2:
+      if(Math.random()<.5){ a=R(4,10); return Q(t("howMany")+"\n"+pick(THINGS).repeat(a), a, numOpts(a,2)); }
+      a=R(1,4); b=R(1,5-a); return Q(a+" + "+b+" = ?", a+b, numOpts(a+b,2));
+    case 3:
+      if(Math.random()<.5){ a=R(1,9); b=R(1,10-a); return Q(a+" + "+b+" = ?", a+b, numOpts(a+b,3)); }
+      a=R(2,10); b=R(1,a); return Q(a+" − "+b+" = ?", a-b, numOpts(a-b,3));
+    case 4:
+      k=R(1,3);
+      if(k===1){ a=R(5,15); b=R(2,20-a); return Q(a+" + "+b+" = ?", a+b, numOpts(a+b,4)); }
+      if(k===2){ a=R(10,20); b=R(2,9); return Q(a+" − "+b+" = ?", a-b, numOpts(a-b,4)); }
+      a=R(1,8)*10; b=R(1,9-a/10)*10; return Q(a+" + "+b+" = ?", a+b, shuffle([a+b,a+b+10,a+b-10,a+b+20]));
+    case 5:
+      k=R(1,3);
+      if(k===1){ a=R(12,60); b=R(11,39); return Q(a+" + "+b+" = ?", a+b, numOpts(a+b,10)); }
+      if(k===2){ a=R(40,99); b=R(11,39); return Q(a+" − "+b+" = ?", a-b, numOpts(a-b,10)); }
+      a=pick([2,5,10]); b=R(2,10); return Q(b+" × "+a+" = ?", a*b, numOpts(a*b,a*2));
+    case 6:
+      if(Math.random()<.55){ a=R(3,10); b=R(3,10); return Q(a+" × "+b+" = ?", a*b, numOpts(a*b,8)); }
+      b=R(2,10); a=b*R(2,10); return Q(a+" ÷ "+b+" = ?", a/b, numOpts(a/b,3));
+    case 7:
+      k=R(1,3);
+      if(k===1){ a=R(11,25); b=R(3,9); return Q(a+" × "+b+" = ?", a*b, numOpts(a*b,12)); }
+      if(k===2){ b=R(3,9); a=b*R(11,20); return Q(a+" ÷ "+b+" = ?", a/b, numOpts(a/b,4)); }
+      b=pick([2,3,4,5]); a=b*R(3,12); return Q(t("fracOf")(b,a), a/b, numOpts(a/b,4));
+    case 8:
+      k=R(1,3);
+      if(k===1){ a=pick([10,20,25,50,75]); b=pick([40,60,80,120,200]); return Q(t("pct")(a,b), a*b/100, numOpts(a*b/100,10)); }
+      if(k===2){ a=R(11,89)/10; b=R(11,89)/10; r=Math.round((a+b)*10); return Q(a.toFixed(1)+" + "+b.toFixed(1)+" = ?", (r/10).toFixed(1), numOpts(r,12).map(v=>(v/10).toFixed(1))); }
+      b=pick([4,5,8,10]); a=R(1,b-1); c=R(1,b-a);
+      return Q(a+"/"+b+" + "+c+"/"+b+" = ?", (a+c)+"/"+b, uniq4([(a+c)+"/"+b,(a+c)+"/"+(b*2),(a+c+1)+"/"+b,(a+c+2)+"/"+b,(a+c+3)+"/"+b]));
+    default:
+      k=R(1,4);
+      if(k===1){ a=R(2,12); b=R(13,25); return Q(a+" − "+b+" = ?", a-b, numOpts(a-b,5,true)); }
+      if(k===2){ a=R(2,9); b=R(2,9); c=R(2,9); r=a+b*c; return Q(a+" + "+b+" × "+c+" = ?", r, uniq4([r,(a+b)*c,a+b+c,r+1,r-1,r+2])); }
+      if(k===3){ a=R(3,15); b=R(a+2,40); return Q(t("xeq")(a,b), b-a, numOpts(b-a,5)); }
+      a=R(4,15); return Q(a+"² = ?", a*a, numOpts(a*a,15));
+  }
+}
+
+/* ================= LOGIC (made fresh every round) ================= */
+const SHAPES = ["🔴","🔵","🟡","🟢","🟣","🟠"];
+function emojiPattern(kind){
+  const e = shuffle(SHAPES); let unit;
+  if(kind===1) unit=[e[0],e[1]];
+  else if(kind===2) unit=[e[0],e[0],e[1]];
+  else unit=[e[0],e[1],e[2]];
+  const len = kind===1 ? 5 : 6;
+  const seq=[]; for(let i=0;i<len;i++) seq.push(unit[i%unit.length]);
+  const ans = unit[len%unit.length];
+  const others = shuffle(SHAPES.filter(x=>x!==ans)).slice(0,3);
+  return Q(t("next")+"\n"+seq.join(" ")+" ❓", ans, shuffle([ans,...others]));
+}
+function seqQ(terms, next, spread){ return Q(t("next")+"\n"+terms.join(", ")+", ❓", next, numOpts(next, spread)); }
+function genLogic(s){
+  let a,d,k,x;
+  switch(s){
+    case 1: return emojiPattern(1);
+    case 2: return emojiPattern(R(1,3));
+    case 3:
+      if(Math.random()<.5) return emojiPattern(R(2,3));
+      a=R(1,12); return seqQ([a,a+1,a+2,a+3], a+4, 2);
+    case 4: d=pick([2,5,10]); a=R(1,10); return seqQ([a,a+d,a+2*d,a+3*d], a+4*d, d+2);
+    case 5:
+      d=R(3,9);
+      if(Math.random()<.5){ a=R(1,20); return seqQ([a,a+d,a+2*d,a+3*d], a+4*d, 4); }
+      a=R(50,90); return seqQ([a,a-d,a-2*d,a-3*d], a-4*d, 4);
+    case 6:
+      if(Math.random()<.5){ a=R(1,5); return seqQ([a,a*2,a*4,a*8], a*16, 8); }
+      d=R(11,25); a=R(5,40); return seqQ([a,a+d,a+2*d,a+3*d], a+4*d, 6);
+    case 7:
+      if(Math.random()<.5){ a=R(1,4); return seqQ([a,a*3,a*9,a*27], a*81, 20); }
+      d=R(2,6); x=R(7,12); a=R(1,15); return seqQ([a,a+d,a+d+x,a+2*d+x,a+2*d+2*x], a+3*d+2*x, 5);
+    case 8:
+      if(Math.random()<.5){ a=R(1,6); return seqQ([a*a,(a+1)**2,(a+2)**2,(a+3)**2], (a+4)**2, 9); }
+      a=R(1,20); d=R(1,4); return seqQ([a,a+d,a+2*d+1,a+3*d+3,a+4*d+6], a+5*d+10, 5);
+    default:
+      k=R(1,3);
+      if(k===1){ a=R(1,6); x=R(a,9); const f=[a,x]; for(let i=0;i<4;i++) f.push(f[f.length-1]+f[f.length-2]); return seqQ(f.slice(0,5), f[5], 7); }
+      if(k===2){ a=R(1,5); const g=[a]; for(let i=0;i<4;i++) g.push(g[g.length-1]*2+1); return seqQ(g.slice(0,4), g[4], 6); }
+      a=R(1,4); return seqQ([a**3,(a+1)**3,(a+2)**3], (a+3)**3, 20);
+  }
+}
+
+/* ================= QUESTION BANKS =================
+   Format: [question, correct answer, wrong, wrong, wrong]  */
+const BANK = {
+sci:{
+1:[["Which one is an animal?","🐶","🚗","🍎","🏠"],["Which one gives us light in the daytime?","☀️","🧦","🍌","🪑"],["Which one can fly?","🐦","🐟","🐄","🐢"],["Which one lives in water?","🐟","🐱","🐔","🐴"],["Which one is cold?","🧊","🔥","☕","🍲"],["What do we use to see?","👀","👂","👃","👄"],["What do we use to hear?","👂","👀","👃","🦶"],["Which one grows from a seed?","🌻","🚗","⚽","🧸"]],
+2:[["What do plants need to grow?","Water and sun","Candy","Toys","Shoes"],["Which animal gives us milk?","Cow","Snake","Fish","Frog"],["How many legs does a bird have?","2","4","6","8"],["What falls from clouds?","Rain","Sand","Leaves","Stones"],["Which season is the hottest?","Summer","Winter","Autumn","Spring"],["A baby dog is called a...","Puppy","Kitten","Chick","Calf"],["Ice is frozen...","Water","Milk","Sand","Air"],["Which sense uses the nose?","Smell","Taste","Sight","Hearing"]],
+3:[["Which part of a plant is under the ground?","Roots","Leaves","Flowers","Fruit"],["What do we breathe?","Air","Water","Food","Light"],["Which one is a living thing?","Tree","Rock","Car","Chair"],["A caterpillar becomes a...","Butterfly","Bird","Bee","Spider"],["The Sun is a...","Star","Planet","Moon","Cloud"],["Which animal lays eggs?","Chicken","Cat","Dog","Cow"],["What tool measures temperature?","Thermometer","Ruler","Clock","Scale"],["Which one is a liquid?","Juice","Rock","Wood","Ice"]],
+4:[["Which planet do we live on?","Earth","Mars","Venus","Jupiter"],["Water turns to ice when it gets...","Very cold","Very hot","Windy","Dark"],["Which body part pumps blood?","Heart","Lungs","Stomach","Brain"],["A magnet pulls things made of...","Iron","Wood","Plastic","Paper"],["Animals that eat only plants are...","Herbivores","Carnivores","Omnivores","Predators"],["How many days does Earth take to go around the Sun?","About 365","About 30","About 7","About 100"],["Which is the solid form of water?","Ice","Steam","Rain","Fog"],["What do bees collect from flowers?","Nectar","Leaves","Seeds","Stones"]],
+5:[["Which gas do plants take in from the air?","Carbon dioxide","Oxygen","Helium","Nitrogen"],["Which planet is closest to the Sun?","Mercury","Venus","Earth","Mars"],["What force pulls objects toward Earth?","Gravity","Magnetism","Friction","Wind"],["What are the three states of matter?","Solid, liquid, gas","Hot, warm, cold","Big, medium, small","Water, fire, air"],["Which organ do we use to breathe?","Lungs","Heart","Liver","Kidneys"],["What does the Moon orbit?","Earth","The Sun","Mars","The stars"],["Baby frogs are called...","Tadpoles","Cubs","Fawns","Chicks"],["Which bone protects the brain?","Skull","Ribs","Spine","Hip"]],
+6:[["Plants making food from sunlight is called...","Photosynthesis","Digestion","Evaporation","Respiration"],["Which is the largest planet?","Jupiter","Saturn","Earth","Neptune"],["Water changing into vapor is called...","Evaporation","Condensation","Freezing","Melting"],["Which one is a mammal?","Dolphin","Shark","Penguin","Crocodile"],["What causes day and night?","Earth spinning","Earth circling the Sun","The Moon moving","Clouds"],["Which is a good conductor of electricity?","Copper","Rubber","Glass","Wood"],["Which nutrient builds muscles?","Protein","Sugar","Fat","Water"],["A food chain usually starts with...","Plants","Lions","Humans","Insects"]],
+7:[["What is the smallest unit of life?","Cell","Atom","Organ","Tissue"],["Which gas do humans need to breathe?","Oxygen","Carbon dioxide","Hydrogen","Helium"],["Sound is made by...","Vibrations","Light","Gravity","Magnets"],["Which planet is called the Red Planet?","Mars","Venus","Jupiter","Mercury"],["Water boils at how many °C?","100","0","50","212"],["Energy from the Sun is called...","Solar energy","Wind energy","Nuclear energy","Sound energy"],["Which blood cells fight germs?","White blood cells","Red blood cells","Platelets","Plasma"],["Rock formed from cooled lava is...","Igneous","Sedimentary","Metamorphic","Fossil"]],
+8:[["What is the chemical formula of water?","H₂O","CO₂","O₂","NaCl"],["What is the center of an atom called?","Nucleus","Electron","Shell","Orbit"],["Which part is the powerhouse of the cell?","Mitochondria","Ribosome","Cell wall","Vacuole"],["Speed equals...","Distance ÷ time","Distance × time","Time ÷ distance","Mass × time"],["Which layer of Earth do we live on?","Crust","Mantle","Outer core","Inner core"],["What is the unit of force?","Newton","Watt","Joule","Volt"],["Which gas makes up most of the air?","Nitrogen","Oxygen","Carbon dioxide","Argon"],["An acid has a pH...","Below 7","Exactly 7","Above 7","Exactly 14"]],
+9:[["Which particle has a negative charge?","Electron","Proton","Neutron","Nucleus"],["What is the chemical symbol for sodium?","Na","S","So","Sd"],["Every action has an equal and opposite...","Reaction","Speed","Mass","Energy"],["Where is DNA mainly found in a cell?","Nucleus","Membrane","Cytoplasm","Cell wall"],["What is the unit of electrical resistance?","Ohm","Ampere","Volt","Watt"],["A light-year measures...","Distance","Time","Speed","Brightness"],["A cell dividing into two identical cells is...","Mitosis","Meiosis","Osmosis","Diffusion"],["Density equals...","Mass ÷ volume","Mass × volume","Volume ÷ mass","Weight × height"]]
+},
+sci_ar:{
+1:[["أيّ واحد حيوان؟","🐶","🚗","🍎","🏠"],["ما الذي يعطينا الضوء في النهار؟","☀️","🧦","🍌","🪑"],["أيّ واحد يطير؟","🐦","🐟","🐄","🐢"],["أيّ واحد يعيش في الماء؟","🐟","🐱","🐔","🐴"],["أيّ واحد بارد؟","🧊","🔥","☕","🍲"],["بماذا نرى؟","👀","👂","👃","👄"],["بماذا نسمع؟","👂","👀","👃","🦶"],["أيّ واحد ينمو من بذرة؟","🌻","🚗","⚽","🧸"]],
+2:[["ماذا يحتاج النبات لينمو؟","الماء والشمس","الحلوى","الألعاب","الأحذية"],["أي حيوان يعطينا الحليب؟","البقرة","الثعبان","السمكة","الضفدع"],["كم رِجلاً للطائر؟","2","4","6","8"],["ماذا ينزل من الغيوم؟","المطر","الرمل","الأوراق","الحجارة"],["أي فصل هو الأكثر حرارة؟","الصيف","الشتاء","الخريف","الربيع"],["ماذا نسمّي صغير الكلب؟","جرو","هريرة","كتكوت","عجل"],["الثلج هو ... متجمّد","ماء","حليب","رمل","هواء"],["أي حاسة نستخدم فيها الأنف؟","الشم","التذوق","البصر","السمع"]],
+3:[["أي جزء من النبات يكون تحت الأرض؟","الجذور","الأوراق","الأزهار","الثمار"],["ماذا نتنفس؟","الهواء","الماء","الطعام","الضوء"],["أي واحد كائن حي؟","الشجرة","الصخرة","السيارة","الكرسي"],["اليرقة تتحول إلى...","فراشة","عصفور","نحلة","عنكبوت"],["الشمس هي...","نجم","كوكب","قمر","غيمة"],["أي حيوان يبيض؟","الدجاجة","القطة","الكلب","البقرة"],["أي أداة تقيس الحرارة؟","ميزان الحرارة","المسطرة","الساعة","الميزان"],["أي واحد سائل؟","العصير","الصخر","الخشب","الثلج"]],
+4:[["على أي كوكب نعيش؟","الأرض","المريخ","الزهرة","المشتري"],["يتحول الماء إلى ثلج عندما يصبح...","بارداً جداً","حاراً جداً","عاصفاً","مظلماً"],["أي عضو يضخ الدم؟","القلب","الرئتان","المعدة","الدماغ"],["المغناطيس يجذب الأشياء المصنوعة من...","الحديد","الخشب","البلاستيك","الورق"],["الحيوانات التي تأكل النبات فقط تسمى...","آكلات الأعشاب","آكلات اللحوم","القوارت","المفترسات"],["كم يوماً تحتاج الأرض لتدور حول الشمس؟","حوالي 365","حوالي 30","حوالي 7","حوالي 100"],["ما الحالة الصلبة للماء؟","الثلج","البخار","المطر","الضباب"],["ماذا يجمع النحل من الأزهار؟","الرحيق","الأوراق","البذور","الحجارة"]],
+5:[["أي غاز يأخذه النبات من الهواء؟","ثاني أكسيد الكربون","الأكسجين","الهيليوم","النيتروجين"],["أي كوكب هو الأقرب إلى الشمس؟","عطارد","الزهرة","الأرض","المريخ"],["ما القوة التي تجذب الأشياء نحو الأرض؟","الجاذبية","المغناطيسية","الاحتكاك","الرياح"],["ما حالات المادة الثلاث؟","صلبة، سائلة، غازية","حارة، دافئة، باردة","كبيرة، متوسطة، صغيرة","ماء، نار، هواء"],["بأي عضو نتنفس؟","الرئتان","القلب","الكبد","الكليتان"],["حول ماذا يدور القمر؟","الأرض","الشمس","المريخ","النجوم"],["ماذا نسمّي صغير الضفدع؟","أبو ذنيبة","شبل","كتكوت","عجل"],["أي عظم يحمي الدماغ؟","الجمجمة","الأضلاع","العمود الفقري","الحوض"]],
+6:[["صنع النبات غذاءه من ضوء الشمس يسمى...","البناء الضوئي","الهضم","التبخر","التنفس"],["ما أكبر كوكب؟","المشتري","زحل","الأرض","نبتون"],["تحوّل الماء إلى بخار يسمى...","التبخر","التكاثف","التجمد","الانصهار"],["أي واحد من الثدييات؟","الدلفين","القرش","البطريق","التمساح"],["ما سبب تعاقب الليل والنهار؟","دوران الأرض حول نفسها","دوران الأرض حول الشمس","حركة القمر","الغيوم"],["أي مادة موصلة جيدة للكهرباء؟","النحاس","المطاط","الزجاج","الخشب"],["أي عنصر غذائي يبني العضلات؟","البروتين","السكر","الدهون","الماء"],["السلسلة الغذائية تبدأ عادةً بـ...","النباتات","الأسود","الإنسان","الحشرات"]],
+7:[["ما أصغر وحدة في الكائن الحي؟","الخلية","الذرة","العضو","النسيج"],["أي غاز يحتاجه الإنسان للتنفس؟","الأكسجين","ثاني أكسيد الكربون","الهيدروجين","الهيليوم"],["الصوت ينتج عن...","الاهتزازات","الضوء","الجاذبية","المغناطيس"],["أي كوكب يسمى الكوكب الأحمر؟","المريخ","الزهرة","المشتري","عطارد"],["عند أي درجة مئوية يغلي الماء؟","100","0","50","212"],["الطاقة القادمة من الشمس تسمى...","الطاقة الشمسية","طاقة الرياح","الطاقة النووية","الطاقة الصوتية"],["أي خلايا الدم تحارب الجراثيم؟","خلايا الدم البيضاء","خلايا الدم الحمراء","الصفائح الدموية","البلازما"],["الصخور التي تتكون من الحمم المتجمدة هي صخور...","نارية","رسوبية","متحولة","أحفورية"]],
+8:[["ما الصيغة الكيميائية للماء؟","H₂O","CO₂","O₂","NaCl"],["ماذا يسمى مركز الذرة؟","النواة","الإلكترون","المدار","الغلاف"],["أي جزء هو مصنع الطاقة في الخلية؟","الميتوكوندريا","الرايبوسوم","الجدار الخلوي","الفجوة"],["السرعة تساوي...","المسافة ÷ الزمن","المسافة × الزمن","الزمن ÷ المسافة","الكتلة × الزمن"],["على أي طبقة من الأرض نعيش؟","القشرة","الوشاح","اللب الخارجي","اللب الداخلي"],["ما وحدة قياس القوة؟","نيوتن","واط","جول","فولت"],["أي غاز يشكّل معظم الهواء؟","النيتروجين","الأكسجين","ثاني أكسيد الكربون","الأرجون"],["الرقم الهيدروجيني للحمض يكون...","أقل من 7","يساوي 7","أكثر من 7","يساوي 14"]],
+9:[["أي جسيم يحمل شحنة سالبة؟","الإلكترون","البروتون","النيوترون","النواة"],["ما الرمز الكيميائي للصوديوم؟","Na","S","So","Sd"],["لكل فعل ... مساوٍ له في المقدار ومعاكس له في الاتجاه","ردّ فعل","سرعة","كتلة","طاقة"],["أين يوجد الحمض النووي غالباً في الخلية؟","النواة","الغشاء","السيتوبلازم","الجدار الخلوي"],["ما وحدة قياس المقاومة الكهربائية؟","أوم","أمبير","فولت","واط"],["السنة الضوئية تقيس...","المسافة","الزمن","السرعة","السطوع"],["انقسام الخلية إلى خليتين متطابقتين يسمى...","الانقسام المتساوي","الانقسام المنصّف","الخاصية الأسموزية","الانتشار"],["الكثافة تساوي...","الكتلة ÷ الحجم","الكتلة × الحجم","الحجم ÷ الكتلة","الوزن × الارتفاع"]]
+},
+ara:{
+1:[["🦁 أَسَد تبدأ بحرف...","أ","ب","س","د"],["🦆 بَطّة تبدأ بحرف...","ب","ت","ط","ن"],["🍎 تُفّاحة تبدأ بحرف...","ت","ف","ب","ح"],["🐪 جَمَل تبدأ بحرف...","ج","ح","م","ل"],["🐟 سَمَكة تبدأ بحرف...","س","ش","ك","م"],["☀️ شَمْس تبدأ بحرف...","ش","س","م","ص"],["🌙 قَمَر تبدأ بحرف...","ق","ف","م","ر"],["🐘 فِيل تبدأ بحرف...","ف","ق","ي","ل"]],
+2:[["أي حرف يأتي بعد حرف (أ)؟","ب","ت","ج","د"],["أي حرف يأتي بعد حرف (ب)؟","ت","ث","أ","ج"],["أي كلمة تبدأ بحرف (م)؟","موز","تفاح","عنب","برتقال"],["ما لون الموز؟","أصفر","أزرق","أحمر","أسود"],["ما عكس كلمة (كبير)؟","صغير","طويل","سريع","جميل"],["كم حرفاً في كلمة (باب)؟","3","2","4","5"],["أي كلمة اسم حيوان؟","قطة","كرسي","قلم","باب"],["ما عكس كلمة (حار)؟","بارد","ساخن","جاف","قوي"]],
+3:[["أي كلمة مكتوبة بشكل صحيح؟","مدرسة","مدرصة","مدرست","مضرسة"],["ما عكس كلمة (فوق)؟","تحت","أمام","خلف","بين"],["ما جمع كلمة (كتاب)؟","كُتُب","كتابات","كتابون","كتابين"],["أي كلمة تنتهي بنفس صوت كلمة (نار)؟","دار","نور","ورد","بحر"],["أكمل: الولدُ ___ بالكرة.","يلعبُ","تلعبُ","يلعبون","تلعبين"],["ما مؤنث كلمة (معلّم)؟","معلّمة","معلّمون","معلّمين","معلّمان"],["ما اسم الحركة في (بَ)؟","الفتحة","الضمة","الكسرة","السكون"],["ما عكس كلمة (سريع)؟","بطيء","قوي","خفيف","قريب"]],
+4:[["أي كلمة اسم؟","شجرة","يكتب","ذهبَ","في"],["أي كلمة فعل؟","يقرأ","قلم","جميل","على"],["ما جمع كلمة (ولد)؟","أولاد","ولدات","ولدون","والد"],["أي كلمة فيها تاء مربوطة؟","حديقة","بيت","بنات","صوت"],["أي كلمة فيها لام شمسية؟","الشمس","القمر","الباب","الكتاب"],["أي كلمة فيها لام قمرية؟","القمر","الشمس","النور","السماء"],["ما مفرد كلمة (أقلام)؟","قلم","قلمان","قلوم","أقلم"],["ما عكس كلمة (ليل)؟","نهار","مساء","ظلام","قمر"]],
+5:[["أي كلمة صفة؟","طويل","يجري","مدرسة","إلى"],["أي كلمة حرف جر؟","في","كتبَ","ولد","سريع"],["ما مثنى كلمة (كتاب)؟","كتابان","كتب","كتابات","كتابون"],["ما مرادف كلمة (سعيد)؟","مسرور","حزين","غاضب","متعب"],["أي فعل في الزمن الماضي؟","كتبَ","يكتبُ","اُكتبْ","سيكتبُ"],["ما عكس كلمة (غني)؟","فقير","كريم","قوي","كبير"],["أي جملة صحيحة؟","البنتُ تقرأُ الكتاب.","البنتُ يقرأُ الكتاب.","البنتُ يقرؤون الكتاب.","البنتُ قرأوا الكتاب."],["ما جمع كلمة (مدرسة)؟","مدارس","مدرسات","مدرسون","مدرستان"]],
+6:[["الجملة (الجوُّ جميلٌ) هي جملة...","اسمية","فعلية","استفهامية","شرطية"],["الجملة (ذهبَ الولدُ إلى المدرسة) هي جملة...","فعلية","اسمية","تعجبية","ندائية"],["ما الفاعل في (كتبَ أحمدُ الدرسَ)؟","أحمد","كتب","الدرس","لا يوجد فاعل"],["أي فعل مضارع؟","يلعبُ","لعبَ","اِلعبْ","لاعب"],["أي فعل أمر؟","اُكتبْ","كتبَ","يكتبُ","كاتب"],["ما مرادف كلمة (منزل)؟","بيت","شارع","مدينة","باب"],["ما جمع كلمة (معلّم)؟","معلّمون","معلّمات","معلّمان","معالم"],["أي كلمة مكتوبة بشكل صحيح؟","سماء","سماأ","سمائ","سماؤ"]],
+7:[["ما المبتدأ في (العلمُ نورٌ)؟","العلم","نور","لا يوجد مبتدأ","الجملة كلها"],["ما الخبر في (السماءُ صافيةٌ)؟","صافية","السماء","لا يوجد خبر","الجملة كلها"],["ما المفعول به في (أكلَ الولدُ التفاحةَ)؟","التفاحة","الولد","أكل","لا يوجد مفعول به"],["ما علامة رفع الفاعل المفرد؟","الضمة","الفتحة","الكسرة","السكون"],["(كأنَّ القمرَ مصباحٌ) مثال على...","التشبيه","الاستفهام","النداء","الأمر"],["ما مضاد كلمة (شجاع)؟","جبان","قوي","كريم","ذكي"],["ما جمع كلمة (طالبة)؟","طالبات","طلاب","طالبون","طالبتان"],["أي كلمة تبدأ بهمزة قطع؟","أحمد","اسم","ابن","اثنان"]],
+8:[["(كان) وأخواتها ترفع المبتدأ و___ الخبر.","تنصب","ترفع","تجرّ","تجزم"],["(إنَّ) وأخواتها ___ المبتدأ وترفع الخبر.","تنصب","ترفع","تجرّ","تجزم"],["ما إعراب (الكتابَ) في (قرأتُ الكتابَ)؟","مفعول به","فاعل","مبتدأ","خبر"],["الاسم بعد حرف الجر يكون...","مجروراً","مرفوعاً","منصوباً","مجزوماً"],["ما نوع الجمع في (مهندسون)؟","جمع مذكر سالم","جمع مؤنث سالم","جمع تكسير","مثنى"],["ما مرادف كلمة (الشجاعة)؟","البسالة","الخوف","الكرم","الصبر"],["أي كلمة جمع تكسير؟","كُتُب","معلّمون","طالبات","كتابان"],["أي أداة تجزم الفعل المضارع؟","لم","لن","أنْ","كي"]],
+9:[["ما إعراب (مسرعاً) في (جاء الولدُ مسرعاً)؟","حال","مفعول به","صفة","خبر"],["أي أداة تنصب الفعل المضارع؟","لن","لم","لا الناهية","لمّا"],["(العلمُ نورٌ) تشبيه حُذفت منه الأداة ووجه الشبه، ويسمى تشبيهاً...","بليغاً","مرسلاً","مفصّلاً","تمثيلياً"],["ما اسم الفاعل من الفعل (كتبَ)؟","كاتب","مكتوب","كتابة","مكتب"],["ما اسم المفعول من الفعل (فهمَ)؟","مفهوم","فاهم","فهم","تفاهم"],["ما نوع (ما) في (ما أجملَ السماءَ!)؟","تعجبية","نافية","استفهامية","موصولة"],["المضاف إليه يكون دائماً...","مجروراً","مرفوعاً","منصوباً","مجزوماً"],["ما مضاد كلمة (التفاؤل)؟","التشاؤم","الأمل","الفرح","النجاح"]]
+},
+eng:{
+1:[["🍎 APPLE starts with...","A","B","M","S"],["⚽ BALL starts with...","B","D","P","T"],["🐱 CAT starts with...","C","G","O","A"],["🐶 DOG starts with...","D","B","G","O"],["🐟 FISH starts with...","F","H","S","V"],["🌙 MOON starts with...","M","N","W","O"],["☀️ SUN starts with...","S","Z","C","N"],["🌳 TREE starts with...","T","F","R","E"]],
+2:[["Which word rhymes with CAT?","Hat","Dog","Sun","Cup"],["Which word rhymes with BALL?","Tall","Bed","Pig","Run"],["Which letter comes after B?","C","A","D","E"],["Which word is a color?","Red","Dog","Run","Big"],["What is the opposite of BIG?","Small","Tall","Wide","Long"],["Which word starts like SUN?","Sock","Moon","Cat","Top"],["How many letters are in DOG?","3","2","4","5"],["What is the opposite of HOT?","Cold","Warm","Red","Dry"]],
+3:[["Which word is spelled correctly?","Happy","Hapy","Happi","Hapey"],["What is the opposite of UP?","Down","Over","High","Top"],["Which letter is a vowel?","E","B","T","M"],["More than one cat is...","Cats","Cat","Cates","Catz"],["Which word rhymes with TREE?","Bee","Toy","Car","Top"],["The dog ___ barking.","is","are","am","be"],["Which word is an animal?","Rabbit","Table","Happy","Jump"],["What is the opposite of FAST?","Slow","Quick","Run","Far"]],
+4:[["Which word is a noun (a thing)?","Table","Run","Quickly","Happy"],["Which word is a verb (an action)?","Jump","Blue","Chair","Soft"],["What is the plural of BOX?","Boxes","Boxs","Boxies","Box"],["Which mark ends a question?","?",".","!",","],["Which word is spelled correctly?","Friend","Freind","Frend","Friendd"],["What is the past of PLAY?","Played","Plaied","Playd","Plays"],["What is the opposite of EARLY?","Late","Soon","First","Fast"],["She ___ to school every day.","goes","go","going","gone"]],
+5:[["Which word is an adjective?","Beautiful","Sing","Slowly","River"],["What is the plural of CHILD?","Children","Childs","Childes","Childrens"],["What is the past tense of GO?","Went","Goed","Gone","Going"],["Which word means the same as HAPPY?","Glad","Sad","Angry","Tired"],["Which word is spelled correctly?","Because","Becuase","Becose","Beacause"],["What is the opposite of EMPTY?","Full","Open","Light","Clean"],["Which sentence is correct?","They are playing.","They is playing.","They am playing.","They be playing."],["Which is a compound word?","Sunflower","Flower","Sunny","Petal"]],
+6:[["Which word is an adverb?","Quickly","Quick","Quicker","Quickness"],["What is the plural of MOUSE?","Mice","Mouses","Mices","Mouse"],["What is the past tense of EAT?","Ate","Eated","Eaten","Eating"],["Which word means the same as BIG?","Large","Tiny","Thin","Short"],["In UNHAPPY, the prefix UN- means...","Not","Very","Again","Before"],["Which is a proper noun?","Bahrain","country","city","river"],["___ going home now.","They're","Their","There","Theyre"],["Which word is spelled correctly?","Different","Diffrent","Diferent","Differant"]],
+7:[["Which one is a simile?","As brave as a lion","The lion is brave","Brave lions roar","He was a lion"],["Which word means the same as DIFFICULT?","Hard","Easy","Soft","Quick"],["Which word is a conjunction?","Because","Under","Quickly","Table"],["What is the plural of LEAF?","Leaves","Leafs","Leafes","Leavs"],["What is the past tense of WRITE?","Wrote","Writed","Written","Writing"],["What is the opposite of ANCIENT?","Modern","Old","Historic","Aged"],["Which word is spelled correctly?","Necessary","Neccessary","Necesary","Neccesary"],["The main message of a story is its...","Theme","Title","Author","Cover"]],
+8:[["Which one is a metaphor?","Her smile was sunshine","Her smile was like sunshine","She smiled brightly","As bright as sunshine"],["Which word is a preposition?","Between","Running","Bright","Slowly"],["Which word means the same as RAPID?","Fast","Slow","Calm","Heavy"],["I have ___ a letter.","written","wrote","writed","write"],["In FEARLESS, the suffix -LESS means...","Without","Full of","Again","Before"],["What is the opposite of GENEROUS?","Selfish","Kind","Giving","Friendly"],["Which word is spelled correctly?","Definitely","Definately","Definitly","Defenitely"],["Which sentence uses commas correctly?","I bought apples, bananas, and dates.","I bought, apples bananas and dates.","I bought apples bananas, and, dates.","I, bought apples bananas and dates."]],
+9:[["Which one is personification?","The wind whispered","The wind was strong","Wind like a whisper","A windy day"],["Which word means the same as ABUNDANT?","Plentiful","Scarce","Tiny","Empty"],["What is the opposite of TRANSPARENT?","Opaque","Clear","Shiny","Thin"],["Which sentence is in the passive voice?","The cake was eaten by Ali.","Ali ate the cake.","Ali is eating cake.","Ali eats cake."],["Which word is spelled correctly?","Accommodate","Acommodate","Accomodate","Acomodate"],["The root BIO means...","Life","Earth","Water","Book"],["Neither Sara nor Ali ___ here.","is","are","were","be"],["The most exciting point of a story is the...","Climax","Setting","Prologue","Resolution"]]
+}};
+
+function buildRound(subj, stage){
+  if(subj==="math" || subj==="logic"){
+    const gen = subj==="math" ? genMath : genLogic, out=[], seen=new Set(); let guard=0;
+    while(out.length<ROUND && guard++<300){ const q=gen(stage); if(seen.has(q.q)) continue;
+      if(q.opts.length!==4 || new Set(q.opts).size!==4 || !q.opts.includes(q.a)) continue; seen.add(q.q); out.push(q); }
+    while(out.length<ROUND) out.push(gen(stage));
+    return out;
+  }
+  const bank = subj==="sci" && LANG==="ar" ? BANK.sci_ar : BANK[subj];
+  return shuffle(bank[stage]).slice(0,ROUND).map(r => Q(r[0], r[1], shuffle(r.slice(1))));
+}
+
+/* ================= SAVED DATA ================= */
+let data = {kids:[], cur:null, lang:null};
+function load(){ try{ const raw=localStorage.getItem(KEY); if(raw){ const d=JSON.parse(raw); if(d && Array.isArray(d.kids)) data=d; } }catch(e){} }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(data)); }catch(e){} }
+const kid = () => data.kids.find(k=>k.id===data.cur);
+const best = (k,sub,s) => (k.best[sub] && k.best[sub][s]) || 0;
+const stagePassed = (k,s) => SUBJ.every(x => best(k,x.id,s) >= PASS);
+function unlocked(k){ let u=stageOfAge(k.age); while(u<STAGES && stagePassed(k,u)) u++; return u; }
+function levelLabel(k){
+  const u=unlocked(k), champion = u===STAGES && stagePassed(k,STAGES);
+  const diff = ageOf(u) - k.age;
+  let txt = champion ? t("champ") : t("workingAt")(ageOf(u)), up=false;
+  if(diff>0){ txt += t("ahead")(diff); up=true; }
+  else if(!champion) txt += t("onTrack");
+  return {txt, up, u, champion};
+}
+
+/* ================= SCREENS ================= */
+const SCREENS=["sProfiles","sNew","sHome","sPlay","sResult","sGate","sParent","sRead","sLesson"];
+let screen="sProfiles";
+function show(id){ screen=id; SCREENS.forEach(s=>$(s).classList.toggle("hidden", s!==id));
+  $("switchBtn").classList.toggle("hidden", id!=="sHome");
+  stopSpeak();
+  const mid = id==="sPlay"||id==="sGate"||id==="sResult"||id==="sLesson";
+  $("parentBtn").classList.toggle("hidden", mid||id==="sParent");
+  $("langBtn").classList.toggle("hidden", mid||id==="sNew"); window.scrollTo(0,0); }
+function applyLang(){
+  document.documentElement.lang=LANG; document.documentElement.dir = LANG==="ar" ? "rtl" : "ltr";
+  document.querySelectorAll("[data-t]").forEach(e=>e.textContent=t(e.dataset.t));
+  $("langBtn").textContent=t("langBtn"); $("soundBtn").textContent=soundOn()?t("soundOn"):t("soundOff"); $("switchBtn").textContent=t("switchK"); $("parentBtn").textContent=t("parents");
+}
+$("langBtn").onclick=()=>{ LANG = LANG==="ar" ? "en" : "ar"; data.lang=LANG; save(); applyLang();
+  if(screen==="sHome") renderHome(); else if(screen==="sParent") renderParent(); else if(screen==="sRead") renderRead(); else renderProfiles(); };
+$("soundBtn").onclick=()=>{ data.sound=!soundOn(); save(); if(!soundOn()) stopSpeak(); $("soundBtn").textContent=soundOn()?t("soundOn"):t("soundOff"); };
+const dayStr = d => d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();
+function touchDay(k){ const today=dayStr(new Date()), y=dayStr(new Date(Date.now()-864e5));
+  if(k.lastDay!==today){ k.streak = k.lastDay===y ? (k.streak||0)+1 : 1; k.lastDay=today; } k.last=Date.now(); }
+function curStreak(k){ const today=dayStr(new Date()), y=dayStr(new Date(Date.now()-864e5)); return (k.lastDay===today||k.lastDay===y) ? (k.streak||0) : 0; }
+const starStr = sc => "⭐".repeat(sc>=ROUND?3:sc>=ROUND-1?2:1);
+const stickerOf = (sub,s) => STICKERS[(s-1)*SUBJ.length + SUBJ.findIndex(x=>x.id===sub)];
+function myStickers(k){ const out=[]; for(let s=1;s<=STAGES;s++) SUBJ.forEach(x=>{ if(best(k,x.id,s)>=PASS) out.push(stickerOf(x.id,s)); }); return out; }
+
+function esc(s){ return String(s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function renderProfiles(){
+  const box=$("kidList"); box.innerHTML="";
+  data.kids.forEach(k=>{
+    const b=document.createElement("button"); b.className="kid";
+    b.innerHTML='<span class="av">'+k.av+'</span>'+esc(k.name)+'<small>'+t("ageN")(k.age)+'</small>';
+    b.onclick=()=>{ data.cur=k.id; save(); selStage=null; renderHome(); };
+    box.appendChild(b);
+  });
+  const add=document.createElement("button"); add.className="kid";
+  add.innerHTML='<span class="av">➕</span>'+t("addChild");
+  add.onclick=openNew; box.appendChild(add);
+  show("sProfiles");
+}
+
+let newAge=null, newAv=AVATARS[0];
+function openNew(){
+  newAge=null; newAv=AVATARS[0]; $("nameIn").value=""; $("newMsg").textContent="";
+  const ap=$("agePick"); ap.innerHTML="";
+  for(let a=4;a<=12;a++){ const b=document.createElement("button"); b.className="pick"; b.textContent=a;
+    b.onclick=()=>{ newAge=a; [...ap.children].forEach(c=>c.classList.toggle("on",c===b)); }; ap.appendChild(b); }
+  const vp=$("avPick"); vp.innerHTML="";
+  AVATARS.forEach((v,i)=>{ const b=document.createElement("button"); b.className="pick"+(i===0?" on":""); b.textContent=v;
+    b.onclick=()=>{ newAv=v; [...vp.children].forEach(c=>c.classList.toggle("on",c===b)); }; vp.appendChild(b); });
+  show("sNew");
+}
+$("cancelNew").onclick=renderProfiles;
+$("saveNew").onclick=()=>{
+  const name=$("nameIn").value.trim();
+  if(!name){ $("newMsg").textContent=t("needName"); return; }
+  if(!newAge){ $("newMsg").textContent=t("needAge"); return; }
+  const k={id:"k"+Date.now(), name, age:newAge, av:newAv, best:{}, stats:{}, last:null};
+  data.kids.push(k); data.cur=k.id; save(); selStage=null; renderHome();
+};
+
+let selStage=null;
+function renderHome(){
+  const k=kid(); if(!k){ renderProfiles(); return; }
+  const L=levelLabel(k);
+  if(selStage===null || selStage>L.u) selStage=L.u;
+  $("hAv").textContent=k.av; $("hName").textContent=k.name+" · "+t("ageN")(k.age);
+  $("hBadge").textContent=L.txt; $("hBadge").className="badge"+(L.up?" up":"");
+  const sk=curStreak(k); $("hStreak").textContent=sk?t("streak")(sk):""; $("hStreak").classList.toggle("hidden", !sk);
+  const st=myStickers(k); $("stTitle").textContent=t("stickers")(st.length); $("stickers").textContent=st.join(" "); $("stNone").classList.toggle("hidden", st.length>0);
+  const chips=$("chips"); chips.innerHTML="";
+  for(let s=1;s<=STAGES;s++){
+    const locked=s>L.u, done=stagePassed(k,s);
+    const b=document.createElement("button");
+    b.className="chip"+(locked?" locked":"")+(s===selStage?" sel":"");
+    b.innerHTML=(locked?"🔒":done?"✅":"⭐")+" "+t("levelN")(s)+"<small>"+t("ageN")(ageOf(s))+(s===stageOfAge(k.age)?t("myAge"):"")+"</small>";
+    b.onclick=()=>{ if(locked){ $("stageHint").textContent=t("lockedHint")(s); return; } selStage=s; renderHome(); };
+    chips.appendChild(b);
+    if(s===selStage) setTimeout(()=>b.scrollIntoView({inline:"center",block:"nearest"}),0);
+  }
+  const doneCount=SUBJ.filter(x=>best(k,x.id,selStage)>=PASS).length;
+  $("stageHint").textContent = stagePassed(k,selStage) ? t("passedHint")(selStage) : t("todoHint")(doneCount);
+  const box=$("subjects"); box.innerHTML="";
+  SUBJ.forEach(x=>{
+    const sc=best(k,x.id,selStage);
+    const b=document.createElement("button"); b.className="subj"; b.style.background=x.col;
+    b.innerHTML='<span class="ic">'+x.ic+'</span>'+t("s_"+x.id)+'<small>'+(sc>=PASS?starStr(sc)+"<br>"+t("sPassed")(sc):sc>0?t("sTry")(sc):t("sNew"))+'</small>';
+    b.onclick=()=>startRound(x.id, selStage);
+    box.appendChild(b);
+  });
+  show("sHome");
+}
+$("switchBtn").onclick=renderProfiles;
+
+/* ================= LEARN TO READ: screens ================= */
+let readLang=null, lesson=null, li=0;
+function renderRead(){
+  const k=kid(); if(!k){ renderProfiles(); return; }
+  readMode=null; readLang=readLang||LANG; k.read=k.read||{};
+  const tabs=$("rdTabs"); tabs.innerHTML="";
+  [["en","English"],["ar","العربية"]].forEach(([lg,name])=>{ const b=document.createElement("button"); b.className="pick"+(lg===readLang?" on":""); b.textContent=name;
+    b.onclick=()=>{ readLang=lg; renderRead(); }; tabs.appendChild(b); });
+  const box=$("rdSteps"); box.innerHTML="";
+  READ[readLang].forEach((stp,i)=>{ const b=document.createElement("button"); b.className="step";
+    b.textContent=(k.read[readLang+i]?"✅":"📘")+"  "+(i+1)+". "+t("rs"+(i+1)); b.onclick=()=>openLesson(i); box.appendChild(b); });
+  $("rdNote").textContent = voiceReady() ? t("readHint") : t("noVoice");
+  show("sRead");
+}
+function openLesson(i){ lesson={lang:readLang, step:i, cards:READ[readLang][i].cards}; li=0; show("sLesson"); renderCard(); }
+function sayCard(){ speak(lesson.cards[li].all.map(x=>({text:x, lang:lesson.lang}))); }
+function renderCard(){
+  const c=lesson.cards[li];
+  $("lTitle").textContent=(lesson.step+1)+". "+t("rs"+(lesson.step+1)); $("lCount").textContent=(li+1)+" / "+lesson.cards.length;
+  const box=$("lTokens"); box.innerHTML=""; box.dir = lesson.lang==="ar" ? "rtl" : "ltr";
+  c.tokens.forEach(tk=>{ const b=document.createElement("button"); b.className="tok"; b.textContent=tk.txt;
+    b.onclick=()=>speak([{text:tk.say, lang:lesson.lang}]); box.appendChild(b); });
+  $("lSub").textContent=c.sub; $("lSub").dir = lesson.lang==="ar" ? "rtl" : "ltr";
+  $("lPrev").disabled = li===0; $("lNext").disabled = li===lesson.cards.length-1;
+  $("lSay").classList.toggle("hidden", !voiceReady()); $("lGame").classList.toggle("hidden", !voiceReady());
+  if(soundOn()) sayCard();
+}
+$("readBtn").onclick=renderRead; $("rdBack").onclick=renderHome; $("lBack").onclick=renderRead;
+$("lSay").onclick=sayCard;
+$("lPrev").onclick=()=>{ if(li>0){ li--; renderCard(); } };
+$("lNext").onclick=()=>{ if(li<lesson.cards.length-1){ li++; renderCard(); } };
+$("lGame").onclick=()=>startListen(lesson.lang, lesson.step);
+function startListen(lang, step){
+  const pool=READ[lang][step].pool, items=shuffle(pool).slice(0, Math.min(6,pool.length));
+  round=items.map(it=>({q:t("tapHear"), a:it.show,
+    opts:shuffle([it.show, ...shuffle(pool.filter(p=>p.show!==it.show)).slice(0,3).map(p=>p.show)]), say:[{text:it.say, lang}]}));
+  readMode={lang, step}; begin();
+}
+
+/* ================= PLAY ================= */
+let round=[], qi=0, score=0, busy=false, curSub=null, curStage=1, timer=null, missed=[], review=false, readMode=null;
+const subLang = () => readMode ? readMode.lang : curSub==="eng" ? "en" : curSub==="ara" ? "ar" : LANG;
+const small = () => !!readMode || curStage<=3;      // youngest levels: questions are read aloud
+function startRound(sub, stage){ readMode=null; curSub=sub; curStage=stage; round=buildRound(sub,stage); begin(); }
+function begin(){ qi=0; score=0; missed=[]; review=false; show("sPlay"); renderQ(true); }
+function qLines(it, first){
+  if(it.say) return (first ? [{text:cleanSay(it.q, LANG), lang:LANG}] : []).concat(it.say);
+  const lg=subLang(); let txt=cleanSay(it.q.replace(/\n/g," , "), lg);
+  if(curSub==="math") txt=mathSay(txt, lg);
+  const lines=[{text:txt, lang:lg}];
+  it.opts.forEach((o,i)=>{ const c=cleanSay(o, lg); if(c && /\p{L}/u.test(c)) lines.push({text:c, lang:lg, id:"o"+i}); });
+  return lines;
+}
+function renderQ(first){
+  busy=false; const list=review?missed:round, it=list[qi], x=SUBJ.find(v=>v.id===curSub);
+  $("pTitle").textContent = review ? t("reviewTitle") : readMode ? "🎧 "+t("rs"+(readMode.step+1)) : x.ic+" "+t("s_"+curSub)+" · "+t("levelN")(curStage);
+  $("pCount").textContent=(qi+1)+" / "+list.length;
+  $("pBar").style.width=(qi/list.length*100)+"%";
+  const qb=$("pQ"); qb.innerHTML="";
+  it.q.split("\n").forEach(line=>{ const d=document.createElement("div"); d.dir="auto"; d.textContent=line; qb.appendChild(d); });
+  $("pFb").textContent="";
+  const box=$("pOpts"); box.innerHTML="";
+  box.classList.toggle("long", it.opts.some(o=>o.length>12));
+  it.opts.forEach(o=>{ const b=document.createElement("button"); b.className="opt"; b.dir="auto"; b.textContent=o;
+    b.onclick=()=>answer(b,o); box.appendChild(b); });
+  $("sayBtn").classList.toggle("hidden", !voiceReady());
+  if(readMode || (small() && soundOn())) speak(qLines(it, !!first));
+}
+$("sayBtn").onclick=()=>{ const it=(review?missed:round)[qi]; if(it && !busy) speak(qLines(it, false)); };
+function answer(btn,val){
+  if(busy) return; busy=true; stopSpeak();
+  const it=(review?missed:round)[qi], ok = val===it.a, k=kid();
+  if(!review){
+    if(!readMode){ k.stats[curSub]=k.stats[curSub]||{c:0,t:0}; k.stats[curSub].t++; if(ok) k.stats[curSub].c++; }
+    if(ok) score++; else missed.push(it);
+  }
+  beep(ok);
+  if(ok){ const msg=pick(t("good")); btn.classList.add("right"); $("pFb").textContent=msg;
+    if(small() && soundOn()) speak([{text:cleanSay(msg, LANG), lang:LANG}]); }
+  else{ btn.classList.add("wrong"); [...$("pOpts").children].forEach(b=>{ if(b.textContent===it.a) b.classList.add("right"); });
+    $("pFb").textContent=t("answerIs")(it.a);
+    if(readMode) speak(it.say);
+    else if(small() && soundOn()){ const a=cleanSay(it.a, subLang()); speak(a ? [{text:t("answerSay"), lang:LANG},{text:a, lang:subLang()}] : [{text:t("lookSay"), lang:LANG}]); } }
+  timer=setTimeout(nextQ, ok?1200:2600);
+}
+function nextQ(){
+  const list=review?missed:round; qi++;
+  if(qi<list.length){ renderQ(); return; }
+  if(!review && missed.length){ review=true; qi=0; missed=missed.map(q=>Object.assign({}, q, {opts:shuffle(q.opts)})); renderQ(); return; }
+  if(readMode) finishRead(); else finish();
+}
+$("quitBtn").onclick=()=>{ clearTimeout(timer); save(); if(readMode) renderRead(); else renderHome(); };
+
+function finish(){
+  const k=kid(), before=unlocked(k), wasPassed=stagePassed(k,curStage), oldBest=best(k,curSub,curStage);
+  k.best[curSub]=k.best[curSub]||{};
+  k.best[curSub][curStage]=Math.max(oldBest, score);
+  touchDay(k); save();
+  const after=unlocked(k), passed=score>=PASS, nowPassed=stagePassed(k,curStage);
+  $("rEmoji").textContent = passed ? (score===ROUND?"🏆":"🌟") : "🌈";
+  $("rTitle").textContent = passed ? t("youPassed") : t("almost");
+  $("rStars").textContent = passed ? starStr(score) : "";
+  $("rDetail").textContent = t("got")(score, passed);
+  let extra="";
+  if(after>before){ extra=t("opened")(after, ageOf(after)); if(ageOf(after)>k.age) extra+=t("above"); selStage=after; }
+  else if(nowPassed && !wasPassed && curStage===STAGES) extra=t("champion");
+  else if(passed && !nowPassed) extra=t("stillLeft")(SUBJ.filter(x=>best(k,x.id,curStage)<PASS).map(x=>t("s_"+x.id)).join(LANG==="ar"?"، ":", "));
+  if(passed && oldBest<PASS) extra+=t("newSticker")(stickerOf(curSub,curStage));
+  $("rExtra").textContent=extra; $("rHome").textContent=t("toLevels");
+  show("sResult");
+  if(passed) confetti();
+  if(small() && soundOn()) speak([{text:cleanSay($("rTitle").textContent, LANG), lang:LANG}]);
+}
+function finishRead(){
+  const k=kid(), n=round.length, passed=score>=n-1; k.read=k.read||{};
+  if(passed) k.read[readMode.lang+readMode.step]=true;
+  touchDay(k); save();
+  $("rEmoji").textContent = passed ? "🏆" : "🌈";
+  $("rTitle").textContent = passed ? t("stepDone") : t("almost");
+  $("rStars").textContent = passed ? "⭐".repeat(score===n?3:2) : "";
+  $("rDetail").textContent = t("gotN")(score, n, passed);
+  $("rExtra").textContent=""; $("rHome").textContent=t("backRead");
+  show("sResult");
+  if(passed) confetti();
+  if(soundOn()) speak([{text:cleanSay($("rTitle").textContent, LANG), lang:LANG}]);
+}
+$("rAgain").onclick=()=>{ if(readMode) startListen(readMode.lang, readMode.step); else startRound(curSub,curStage); };
+$("rHome").onclick=()=>{ if(readMode) renderRead(); else renderHome(); };
+
+/* ================= PARENTS ================= */
+let backTo="profiles";
+$("parentBtn").onclick=()=>{
+  backTo = (screen==="sHome"||screen==="sRead") ? "home" : "profiles";
+  const a=R(6,9), b=R(6,9); $("gQ").textContent=a+" × "+b+" = ?";
+  const box=$("gOpts"); box.innerHTML="";
+  numOpts(a*b,9).forEach(v=>{ const btn=document.createElement("button"); btn.className="opt"; btn.textContent=v;
+    btn.onclick=()=>{ if(v===a*b) renderParent(); else goBack(); }; box.appendChild(btn); });
+  show("sGate");
+};
+function goBack(){ if(backTo==="home" && kid()) renderHome(); else renderProfiles(); }
+$("gBack").onclick=goBack; $("pBack").onclick=goBack;
+
+function renderParent(){
+  const box=$("reports"); box.innerHTML="";
+  if(!data.kids.length) box.innerHTML='<p class="sub">'+t("noKids")+'</p>';
+  data.kids.forEach(k=>{
+    const L=levelLabel(k), ageStage=stageOfAge(k.age);
+    let tot=0, cor=0; SUBJ.forEach(x=>{ const s=k.stats[x.id]; if(s){tot+=s.t; cor+=s.c;} });
+    let passedCount=0; for(let s=1;s<=STAGES;s++) if(stagePassed(k,s)) passedCount++;
+    const div=document.createElement("div"); div.className="rep";
+    let h='<h3>'+k.av+' '+esc(k.name)+' · '+t("ageN")(k.age)+'</h3><span class="badge'+(L.up?' up':'')+'">'+L.txt+'</span>';
+    h+='<div class="ladder">';
+    for(let s=1;s<=STAGES;s++) h+='<span class="'+(stagePassed(k,s)?'done':s===L.u?'now':'')+(s===ageStage?' age':'')+'"></span>';
+    h+='</div><p class="note" style="margin:0 0 6px">'+t("ladderNote")+'</p>';
+    h+='<div class="line"><span>'+t("fully")+'</span><b>'+t("ofN")(passedCount,STAGES)+'</b></div>';
+    h+='<div class="line"><span>'+t("answered")+'</span><b>'+tot+(tot?' · '+Math.round(cor/tot*100)+t("correct"):'')+'</b></div>';
+    SUBJ.forEach(x=>{
+      let top=0; for(let s=1;s<=STAGES;s++) if(best(k,x.id,s)>=PASS) top=s;
+      const st=k.stats[x.id], cur=best(k,x.id,L.u);
+      h+='<div class="line"><span>'+x.ic+' '+t("s_"+x.id)+'<br><small>'+
+        (top?t("topPassed")(top,ageOf(top)):t("nonePassed"))+t("curBest")(cur)+'</small></span><b>'+(st&&st.t?Math.round(st.c/st.t*100)+'%':'–')+'</b></div>';
+    });
+    const rd=k.read||{}, rc=lg=>[0,1,2,3].filter(i=>rd[lg+i]).length;
+    h+='<div class="line"><span>📚 '+t("readSteps")+'</span><b>English '+rc("en")+'/4 · العربية '+rc("ar")+'/4</b></div>';
+    h+='<div class="line"><span>'+t("stickersLbl")+'</span><b>'+myStickers(k).length+' / '+(STAGES*SUBJ.length)+'</b></div>';
+    h+='<div class="line"><span>'+t("streakLbl")+'</span><b>'+curStreak(k)+'</b></div>';
+    h+='<div class="line"><span>'+t("lastPlayed")+'</span><b>'+(k.last?new Date(k.last).toLocaleDateString("en-GB"):t("notYet"))+'</b></div>';
+    h+='<div class="row" style="justify-content:flex-start"><button class="btn danger" data-del="'+k.id+'">'+t("remove")+'</button></div>';
+    div.innerHTML=h; box.appendChild(div);
+  });
+  box.querySelectorAll("[data-del]").forEach(b=>{
+    let armed=false;
+    b.onclick=()=>{ if(!armed){ armed=true; b.textContent=t("removeSure"); setTimeout(()=>{armed=false;b.textContent=t("remove");},3000); return; }
+      data.kids=data.kids.filter(k=>k.id!==b.dataset.del); if(data.cur===b.dataset.del) data.cur=null; save(); renderParent(); };
+  });
+  show("sParent");
+}
+
+/* ================= START ================= */
+load();
+LANG = data.lang || ((navigator.language||"").toLowerCase().startsWith("ar") ? "ar" : "en");
+applyLang();
+if(kid()) renderHome(); else renderProfiles();
+try{ if(window.claude && window.claude.use) window.claude.use("tts").then(ns=>{ if(!ns) return; ttsNS=ns;
+  try{ ns.onLine(({id})=>markReading(id||null)); }catch(e){}
+  if(screen==="sPlay") $("sayBtn").classList.remove("hidden");
+  if(screen==="sRead") renderRead(); }).catch(()=>{}); }catch(e){}
+try{ if(synth && synth.getVoices) synth.getVoices(); }catch(e){}
+</script>
+</body>
+</html>
